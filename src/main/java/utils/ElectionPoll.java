@@ -17,71 +17,92 @@ public class ElectionPoll {
             candidates = Candidates;
         }*/
 
-        public ElectionPoll(List<Candidate> Candidates, Role concurredRole){
-            candidates = Candidates;
-            runFor = concurredRole;
+    public ElectionPoll(List<Candidate> Candidates, Role concurredRole) {
+        candidates = Candidates;
+        runFor = concurredRole;
+    }
+
+    private static boolean userEquals(User u1, User u2) {
+        return (u1.getId().equals(u2.getId()));
+    }
+
+    public List<Candidate> runPoll() {
+        List<Candidate> can = candidates;
+        Candidate maxVotes = can.get(0);
+        for (int g = 1; g < can.size(); g++) {
+            Candidate atual = can.get(g);
+            if (maxVotes.votes.size() < atual.votes.size()) {
+                maxVotes = atual;
+            }
         }
 
-        public void sortCandidates(){
-            List<Candidate> can = candidates;
-            List<Candidate> cannot = new ArrayList<Candidate>();
+        for (int g = 0; g < can.size(); g++) {
+            Candidate atual = can.get(g);
+            if (atual.votes.size() < maxVotes.votes.size()) {
+                can.remove(atual);
+            }
+        }
 
-            Candidate maxVotes = can.get(0);
-            for (int g = 1; g < can.size(); g++){
-                Candidate atual = can.get(g);
-                if (maxVotes.votes.size() < atual.votes.size()){
-                    maxVotes = atual;
+        return can;
+
+
+    }
+
+    public void sortCandidates() {
+        List<Candidate> can = candidates;
+        List<Candidate> cannot = new ArrayList<Candidate>();
+
+        Candidate maxVotes = can.get(0);
+        for (int g = 1; g < can.size(); g++) {
+            Candidate atual = can.get(g);
+            if (maxVotes.votes.size() < atual.votes.size()) {
+                maxVotes = atual;
+            }
+        }
+
+        for (int voteCount = maxVotes.votes.size(); voteCount >= 0; voteCount--) {
+            for (int latas = 0; latas < candidates.size(); latas++) {
+                //deve ter um jeito melhor de fazer isso não é possivel
+                if (candidates.get(latas).votes.size() == voteCount) {
+                    cannot.add(candidates.get(latas));
                 }
             }
-
-            for (int voteCount = maxVotes.votes.size(); voteCount >= 0; voteCount--){
-                for (int latas = 0; latas < candidates.size(); latas ++){
-                    //deve ter um jeito melhor de fazer isso não é possivel
-                    if(candidates.get(latas).votes.size() == voteCount){
-                        cannot.add(candidates.get(latas));
-                    }
-                }
-            }
-            candidates = cannot;
-            return;
         }
+        candidates = cannot;
+        return;
+    }
 
-        public void addVote(Candidate candidate, Vote vote){
-            candidate.votes.add(vote);
-        }
+    public void addVote(Candidate candidate, Vote vote) {
+        candidate.votes.add(vote);
+    }
 
-        public void removeVote(Candidate candidate, Vote vote){
-            candidate.votes.remove(vote);
-        }
+    public void removeVote(Candidate candidate, Vote vote) {
+        candidate.votes.remove(vote);
+    }
 
-    public class Candidate{
+    public static class Candidate {
         public Member canditdateUser;
         public String candidateIdent;
         public List<Vote> votes;
 
-        public Candidate(Member user, String name){
+        public Candidate(Member user, String name) {
             canditdateUser = user;
             candidateIdent = name;
 
         }
 
 
-
     }
 
-    public class Vote{
-            public User voteOwner;
-            public Guild voteGuild;
-            public Candidate votedFor;
+    public class Vote {
+        public User voteOwner;
+        public Guild voteGuild;
+        public Candidate votedFor;
 
-            public Vote(User user, Guild guild, Candidate candidate){
-                voteGuild = guild;
-                voteOwner = user;
-                votedFor = candidate;
-            }
-    }
-
-    private static boolean userEquals(User u1, User u2){
-            return (u1.getId().equals(u2.getId()));
+        public Vote(User user, Guild guild, Candidate candidate) {
+            voteGuild = guild;
+            voteOwner = user;
+            votedFor = candidate;
+        }
     }
 }
