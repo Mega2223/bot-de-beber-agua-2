@@ -131,7 +131,7 @@ public class PingPongMatch {
             }
         };
 
-    };
+    }
 
     private Thread thread;
 
@@ -146,11 +146,7 @@ public class PingPongMatch {
     }
 
     private boolean checkIfItsValid(){
-        if(timer >= minTimer && timer <= maxTimer){
-            return true;
-        }
-        else
-            return false;
+        return timer >= minTimer && timer <= maxTimer;
 
     }
 

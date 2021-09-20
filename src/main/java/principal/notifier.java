@@ -13,9 +13,10 @@ import java.util.Random;
 public class notifier extends JFrame {
     private final JLabel label;
     private JLabel label2;
-    public notifier(final User user, final net.dv8tion.jda.api.entities.Icon image){
+
+    public notifier(final User user, final net.dv8tion.jda.api.entities.Icon image) {
         setVisible(true);
-        setSize(180,80);
+        setSize(180, 80);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
@@ -28,17 +29,19 @@ public class notifier extends JFrame {
         label = new JLabel(user.getName() + ":");
         BufferedImage decoded = decodeToImage(image.getEncoding());
         Image foda = decoded;
-        if(decoded == null){System.out.println("NULL PORRA");}
+        if (decoded == null) {
+            System.out.println("NULL PORRA");
+        }
         label2 = new JLabel(new ImageIcon(foda));
 
-        add(label );
+        add(label);
         add(label2);
 
     }
 
     public notifier(final User user, final String message) {
         setVisible(true);
-        setSize(180,80);
+        setSize(180, 80);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
