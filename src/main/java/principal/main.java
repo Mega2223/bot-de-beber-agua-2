@@ -388,6 +388,15 @@ public class main {
                         poll = new ElectionPoll(candidates, cargo);
 
                     }
+                } else if (rawSplit[0].equalsIgnoreCase("-endPoll")){
+                    ElectionPoll.Candidate winner;
+                    List<ElectionPoll.Candidate> runPol = poll.runPoll();
+                    if(runPol.size() == 1){
+                        winner = runPol.get(0);
+                    } else
+                    {
+                        //poll = new ElectionPoll(new ArrayList<ElectionPoll.Candidate>());
+                    }
                 }
 
 

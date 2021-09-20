@@ -7,9 +7,9 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +24,14 @@ public class PlayerManager {
         this.playerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(playerManager);
         AudioSourceManagers.registerLocalSource(playerManager);
+    }
+
+    public static synchronized PlayerManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new PlayerManager();
+        }
+
+        return INSTANCE;
     }
 
     public synchronized GuildMusicManager getGuildMusicManager(Guild guild) {
@@ -65,7 +73,7 @@ public class PlayerManager {
 
                 play(musicManager, firstTrack);
                 //pra tocar as próximas músicas, absolutamente não sei pq isso não tava aqui já
-                for (int g = 1; g< playlist.getTracks().size(); g++){
+                for (int g = 1; g < playlist.getTracks().size(); g++) {
                     musicManager.scheduler.queue(playlist.getTracks().get(g));
                 }
 
@@ -87,13 +95,5 @@ public class PlayerManager {
 
     private void play(GuildMusicManager musicManager, AudioTrack track) {
         musicManager.scheduler.queue(track);
-    }
-
-    public static synchronized PlayerManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new PlayerManager();
-        }
-
-        return INSTANCE;
     }
 }
