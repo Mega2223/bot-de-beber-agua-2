@@ -80,7 +80,6 @@ public class PlayerManager {
             @Override
             public void loadFailed(FriendlyException exception) {
                 channel.sendMessage("Deu pra tocar não mano :(, " + exception.getMessage()).queue();
-                ;
             }
         });
 

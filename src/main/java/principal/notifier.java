@@ -11,7 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Random;
 
 public class notifier extends JFrame {
-    private JLabel label;
+    private final JLabel label;
     private JLabel label2;
     public notifier(final User user, final net.dv8tion.jda.api.entities.Icon image){
         setVisible(true);
@@ -27,7 +27,7 @@ public class notifier extends JFrame {
 
         label = new JLabel(user.getName() + ":");
         BufferedImage decoded = decodeToImage(image.getEncoding());
-        Image foda = (Image)decoded;
+        Image foda = decoded;
         if(decoded == null){System.out.println("NULL PORRA");}
         label2 = new JLabel(new ImageIcon(foda));
 
