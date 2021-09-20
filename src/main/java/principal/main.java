@@ -44,17 +44,13 @@ public class main {
     public static Guild Imperio;
     public static ListenerAdapter Perigosos;
     public static PlayerManager fer;
-    public static void main(String[] args) throws LoginException {
-        //List<GatewayIntent> intents = GatewayIntent.;
-
-        builder = JDABuilder.create("NjU0MDIwNDExMzI3MjUwNDMz.Xe_d-Q.L-yD0EgmEmvmA-YRYIFFM19cFYA", GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
-        //builder = JDABuilder.create("NjU0MDIwNDExMzI3MjUwNDMz.Xe_d-Q.L-yD0EgmEmvmA-YRYIFFM19cFYA");
-        //builder = JDABuilder.createDefault("NjU0MDIwNDExMzI3MjUwNDMz.Xe_d-Q.L-yD0EgmEmvmA-YRYIFFM19cFYA", GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_MEMBERS);
+    public static void main(String[] args) throws LoginException, IOException {
+        DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
+        String key = inputStream.readLine();
+        System.out.println("Ativando na key " + key);
+        builder = JDABuilder.create(key, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
         EnumSet<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS);
-        //System.out.println(intents.size());
-        //for (int f = 0; f < intents.size(); f++){
         builder.enableIntents(intents);
-        //}
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.enableCache(CacheFlag.ACTIVITY);
         jda = builder.build();
