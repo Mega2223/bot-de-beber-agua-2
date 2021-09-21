@@ -39,23 +39,39 @@ public class notifier extends JFrame {
 
     }
 
+    int x;
+    int y;
     public notifier(final User user, final String message) {
         setVisible(true);
-        setSize(180, 80);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
         setFocusable(false);
-        //setUndecorated(true);
+
 
         Random r = new Random();
 
-        setLocation(r.nextInt(800), r.nextInt(800));//todo usa as resoluções preguiçoso
+        setLocation(r.nextInt(1360), r.nextInt(768));//to.do usa as resoluções preguiçoso
 
+        String messag = user.getName() + ":\n" + message;
+        String spt[] = messag.split("\n");
+        int maxc = 0;
+        for(int g = 0; g < spt.length; g++){
+             // bad code lol
+            if(spt[g].length() > maxc){maxc = spt[g].length();}
+        }
 
-        label = new JLabel(user.getName() + " : " + message);
+        //System.out.println("tamanho: " +  x +" : " + y);
+        x = maxc * 10 + 20;
+        y = spt.length * 17 + 60;
+        setSize(x+1, y+1);
+
+        messag = ConvertToHTML(spt);
+        label = new JLabel(messag);
         add(label);
-
+        label.setText(messag);
+        setSize(x, y);
     }
 
     public static BufferedImage decodeToImage(String imageString) {
@@ -72,5 +88,30 @@ public class notifier extends JFrame {
             e.printStackTrace();
         }
         return image;
+    }
+
+
+    private static String ConvertToHTML(String[] eee) {
+        String end = "";
+        for (int cocó = 0; cocó < eee.length; cocó++) {
+            //pra deixar claro eu copiei isso de um projeto antigo
+
+
+            // esse negócio basicamente converte as coisas em um texto HTML
+            // pro swing fazer o split de linha certo e não ficar aquela
+            // aberração da natureza
+            // vai ficar tipo assim: <html>Primeiralinha <br/>segundalinha <br/>terceiralinha etc.
+            if (cocó == 0) {
+                end = "<html>" + eee[cocó];
+            } else if (cocó == 1){
+                end = end + "<br/>" + eee[cocó].replace("-mega","");
+            }
+
+            else {
+                end = end + "<br/>" + eee[cocó];
+            }
+
+        }
+        return end;
     }
 }
