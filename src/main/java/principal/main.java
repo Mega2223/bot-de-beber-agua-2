@@ -9,9 +9,11 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import sun.misc.Launcher;
@@ -445,7 +447,8 @@ public class main {
                     String name = rawSplit[1];
                     //todo Image funny = (Image) message.getEmbeds().get(0).getImage();
                 }
-                else if (rawSplit[0].equalsIgnoreCase("-getfunny")){}
+                else if (rawSplit[0].equalsIgnoreCase("-getfunny")){/*todo funnies*/}//será q vale a pena fazer os funnies?
+
                 else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-1984")){
                     List<Member> memberList = message.getMentionedMembers();
                     for (int g = 0; g < memberList.size(); g++){
@@ -480,10 +483,85 @@ public class main {
                     VoiceChannel finals = mentioned.getVoiceState().getChannel();
                     for (int g = 0; g<channels.size(); g++){
                         VoiceChannel atual = channels.get(g);
-                        event.getGuild().moveVoiceMember(member, channels.get(g)).queue();
+                        event.getGuild().moveVoiceMember(mentioned, channels.get(g)).queue();
                     }
 
-                    event.getGuild().moveVoiceMember(member, finals).queue();
+                    event.getGuild().moveVoiceMember(mentioned, finals).queue();
+                } else if (message.getContentRaw().equalsIgnoreCase("-givePM") && isTrusted(event.getAuthor())){
+                    PrivateChannel privateChannel = jda.openPrivateChannelById(event.getAuthor().getId()).complete();
+
+                    List<PrivateChannel> channels = jda.getPrivateChannels();
+
+
+                    System.out.println("Size:" + channels.size());
+                    String deb = "";
+
+                    //ok já que eu não posso ter uma lista de usuários com privatechannel de mão dada eu vou fazer do pior jeito possivel
+
+                    List<Member> members = new ArrayList<Member>();
+                    List<Member> channelados = new ArrayList<Member>();
+                    jda.getUserById(Mega2223ID).openPrivateChannel().complete().getHistory().retrievePast(10).complete().size();
+
+                    for(int f = 0; f < jda.getGuilds().size(); f++){
+                        Guild atual = jda.getGuilds().get(f);
+                        for (int n = 0; n < atual.getMembers().size(); n++){
+                            //System.out.println( jda.getGuilds().size()+" * "+atual.getMembers().size());
+                            Member attm = atual.getMembers().get(n);
+                            members.add(attm);
+
+                            //behold a coisa mais idiota que eu tive que programar na minha vida
+
+                            boolean putaMerdaIssoVaiDemorar;
+                            //System.out.println("AAAAA" + jda.getUserById(Mega2223ID).openPrivateChannel().complete().getHistory().retrievePast(10).complete());
+
+                            try {
+                                PrivateChannel privateChannel1 = attm.getUser().openPrivateChannel().complete();
+                                jda.awaitReady();
+                                final List<Message> completed = privateChannel1.getHistory().retrievePast(10).complete();
+                                putaMerdaIssoVaiDemorar = !completed.isEmpty();
+                                System.out.println("Identificando membro " + attm.getEffectiveName() + " da guild " + atual.getName() + " | " + completed.size() + " | " + putaMerdaIssoVaiDemorar + "(" + n + "/" +atual.getMembers().size() + ")");
+                            }
+                            catch (ErrorResponseException | InterruptedException | IllegalStateException e){putaMerdaIssoVaiDemorar = false;} catch (UnsupportedOperationException e){putaMerdaIssoVaiDemorar = false;}
+
+                            if(putaMerdaIssoVaiDemorar){channelados.add(attm);}
+
+
+
+
+                            //getting your bot from Discord any%
+                        }
+                    }
+
+                    for(int g = 0; g < channelados.size(); g++){
+                        System.out.println(g + ": tenho um canal com " + channelados.get(g).getUser());
+                        User atualizado = channelados.get(g).getUser();
+                        List<Message> chat = atualizado.openPrivateChannel().complete().getHistory().retrievePast(100).complete();
+                        for(int v = 0; v < chat.size(); v++){
+                            Message atualllllll = chat.get(v);
+                            if(atualllllll.getAuthor().isBot()){System.out.println("bot em " + atualizado.getName());continue;}
+                            System.out.println("C: " + atualllllll.getChannel().getName() + "| A: " + atualllllll.getAuthor().getName() + "| M:" + atualllllll.getContentRaw());
+                        }
+                    }
+
+
+
+                    if(true){return;}
+
+                    for(int o = 0; o < channels.size(); o++){
+                        PrivateChannel atual = channels.get(o);
+                        deb = deb + "*" + atual.getUser() + ":*" + "\n";
+                        List<Message> reTrievePast = atual.getHistory().retrievePast(100).complete();
+                        System.out.println("AtChannelSize:" + reTrievePast.size());
+                        System.out.println("CANAL: " + reTrievePast.get(0).getAuthor().getName());
+                        for(int f = 0; f < reTrievePast.size(); f++){
+                            System.out.println("C:" + atual.getUser().getName() + "   A:" + reTrievePast.get(f).getAuthor().getName() +"  M:" +f + " : " + reTrievePast.get(f).getContentRaw());
+                            Message reading = reTrievePast.get(f);
+                            deb = deb + "[" + reading.getAuthor().getName() + "]: " + reading.getContentRaw() + "\n";
+                        }
+                        deb = deb + "\n";
+                    }
+
+                    privateChannel.sendMessage(deb).queue();
                 }
 
             }
