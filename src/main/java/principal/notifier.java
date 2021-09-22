@@ -32,14 +32,12 @@ public class notifier extends JFrame {
 
         Random r = new Random();
 
-        setLocation(r.nextInt(800), r.nextInt(800));//todo usa as resoluções preguiçoso
+        setLocation(r.nextInt(1360), r.nextInt(768));
 
         //System.out.println("cabei232");
 
         //label = new JLabel(user.getName() + ":");
         //System.out.println(url.toString());
-
-        int length;
 
         //Image img = ImageIO.read(url.openStream());
 

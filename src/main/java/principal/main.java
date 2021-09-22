@@ -7,13 +7,13 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import sun.misc.Launcher;
@@ -22,15 +22,12 @@ import utils.PingPongMatch;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class main {
 
@@ -50,9 +47,9 @@ public class main {
     public static PingPongMatch universalMatch;//todo remove
 
     public static List<User> censoredUsers;
-
     public static void main(String[] args) throws LoginException, IOException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
+        @SuppressWarnings("deprecated")
         String key = inputStream.readLine();
         System.out.println("Ativando na key " + key);
         builder = JDABuilder.create(key, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
@@ -80,7 +77,7 @@ public class main {
         canalDoBot = jda.getTextChannelById("886685128762482800");
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
-        jda.addEventListener(new eventListenerPararelo());
+        jda.addEventListener(new eventListenerParalelo());
          loadCensored();
 
         System.out.println("tudopronto");
@@ -97,12 +94,15 @@ public class main {
 
     public static boolean isTrusted(User user){
         boolean is = false;
-        for(int q = 0; q < TRUSTED.length; q++){
-            if (user.getId().equalsIgnoreCase(TRUSTED[q])){is = true;}
+        for (String s : TRUSTED) {
+            if (user.getId().equalsIgnoreCase(s)) {
+                is = true;
+            }
         }
         return is;
     }
 
+    @SuppressWarnings("unused")
     public static boolean isTrusted(Member user){
         return isTrusted(user.getUser());
     }
@@ -113,7 +113,7 @@ public class main {
         File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
         System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt");
 
-        censoredUsers = new ArrayList<User>();
+        censoredUsers = new ArrayList<>();
         if(true){return;}//fixme
         DataInputStream reader;
         try{
@@ -212,7 +212,27 @@ public class main {
         }
     }
 
-    public static class eventListenerPararelo extends ListenerAdapter {
+    public static class eventListenerParalelo extends ListenerAdapter {
+
+        public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
+            if(event.getAuthor().isBot()){return; }
+            if(isTrusted(event.getAuthor())){
+                String content = event.getMessage().getContentRaw();
+                String[] contentSplit = content.split(" ");
+
+                if(contentSplit[0].equalsIgnoreCase("-manda")){
+                    String personID = contentSplit[1];
+                    String argsss = "";
+                    for(int f = 2; f < contentSplit.length; f++){
+                        argsss = argsss + contentSplit[f] + " ";
+                    }
+                    jda.getUserById(personID).openPrivateChannel().complete().sendMessage(argsss).queue();
+                    event.getAuthor().openPrivateChannel().complete().sendMessage("mandei pro(a) " + jda.getUserById(personID).getName()).queue();
+                }
+
+            }
+            jda.getUserById(Mega2223ID).openPrivateChannel().complete().sendMessage("O user " + event.getAuthor().getName() + " mandou a seguinte mensagem:\n" + event.getMessage().getContentRaw()).queue();
+        }
 
         public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 
