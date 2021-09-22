@@ -19,7 +19,7 @@ public class notifier extends JFrame {
 
     public notifier(final User user, final URL url) throws IOException {
 
-        System.out.println("cabeid");
+        //System.out.println("cabeid");
 
 
         setVisible(true);
@@ -28,16 +28,16 @@ public class notifier extends JFrame {
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
 
-        System.out.println("cabeir");
+        //System.out.println("cabeir");
 
         Random r = new Random();
 
         setLocation(r.nextInt(800), r.nextInt(800));//todo usa as resoluções preguiçoso
 
-        System.out.println("cabei232");
+        //System.out.println("cabei232");
 
         //label = new JLabel(user.getName() + ":");
-        System.out.println(url.toString());
+        //System.out.println(url.toString());
 
         int length;
 
@@ -45,9 +45,9 @@ public class notifier extends JFrame {
 
         System.setProperty("http.agent", "Chrome"); //sério isso?
                                                     //isso é prova definitiva que HTTP é coisa do demônio
-                                                    //mano eu to mt puto vai se fuder era so finjir que era a porra do Chrome
-        System.out.println("cabei333");
-        System.out.println("conectado");
+                                                    //mano eu to mt puto vai se fuder era so fingir que era a porra do Chrome
+        //System.out.println("cabei333");
+        //System.out.println("conectado");
 
         Image bImg = ImageIO.read(url);
         //System.out.println(bImg.getHeight()+":"+bImg.getWidth());
