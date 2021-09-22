@@ -8,40 +8,74 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Random;
 
 public class notifier extends JFrame {
-    private final JLabel label;
+    private JLabel label;
     private JLabel label2;
 
-    public notifier(final User user, final net.dv8tion.jda.api.entities.Icon image) {
+    public notifier(final User user, final URL url) throws IOException {
+
+        System.out.println("cabeid");
+
+
         setVisible(true);
         setSize(180, 80);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
-        setFocusable(false);
+
+        System.out.println("cabeir");
 
         Random r = new Random();
 
         setLocation(r.nextInt(800), r.nextInt(800));//todo usa as resoluções preguiçoso
 
-        label = new JLabel(user.getName() + ":");
-        BufferedImage decoded = decodeToImage(image.getEncoding());
-        Image foda = decoded;
-        if (decoded == null) {
+        System.out.println("cabei232");
+
+        //label = new JLabel(user.getName() + ":");
+        System.out.println(url.toString());
+
+        int length;
+
+        //Image img = ImageIO.read(url.openStream());
+
+        System.setProperty("http.agent", "Chrome"); //sério isso?
+                                                    //isso é prova definitiva que HTTP é coisa do demônio
+                                                    //mano eu to mt puto vai se fuder era so finjir que era a porra do Chrome
+        System.out.println("cabei333");
+        System.out.println("conectado");
+
+        Image bImg = ImageIO.read(url);
+        //System.out.println(bImg.getHeight()+":"+bImg.getWidth());
+
+        if (bImg == null) {
             System.out.println("NULL PORRA");
         }
-        label2 = new JLabel(new ImageIcon(foda));
+        ImageIcon imgIcon = new ImageIcon(bImg);
+        System.out.println("imgIcon: "+imgIcon.getIconHeight() + ":" + imgIcon.getIconWidth());
+        System.out.println("Icon: "+((Icon)imgIcon).getIconHeight() + ":" + ((Icon)imgIcon).getIconWidth());
 
-        add(label);
+        label2 = new JLabel((Icon)imgIcon);
+        label2.setIcon(imgIcon);
+        //add(label);
         add(label2);
-
+        URL url2 = new URL(user.getAvatarUrl());
+        Image iImg = ImageIO.read(url2);
+        setIconImage(iImg);
+        setName(user.getName());
+        setTitle(user.getName() + ":");
+        ImageIcon iC = new ImageIcon(bImg);
+        setSize(iC.getIconWidth(),iC.getIconHeight() + 20); //todo pega a medida da barra
+        System.out.println("cabei");
     }
 
     int x;
     int y;
-    public notifier(final User user, final String message) {
+    public notifier(final User user, String message) {
         setVisible(true);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -74,21 +108,6 @@ public class notifier extends JFrame {
         setSize(x, y);
     }
 
-    public static BufferedImage decodeToImage(String imageString) {
-
-        BufferedImage image = null;
-        byte[] imageByte;
-        try {
-            BASE64Decoder decoder = new BASE64Decoder();
-            imageByte = decoder.decodeBuffer(imageString);
-            ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-            image = ImageIO.read(bis);
-            bis.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return image;
-    }
 
 
     private static String ConvertToHTML(String[] eee) {

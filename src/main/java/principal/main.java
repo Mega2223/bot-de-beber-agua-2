@@ -20,17 +20,21 @@ import utils.PingPongMatch;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class main {
 
     public static final String Mega2223ID = "301424656051732491";
+    public static final String PudimAtomicoID = "491748519984627712";
+    public static final String[] TRUSTED = {Mega2223ID,PudimAtomicoID};
     public static JDABuilder builder;
     public static JDA jda;
     public static TextChannel canalDoBot;
@@ -39,9 +43,10 @@ public class main {
     public static PlayerManager fer;
     public static ListenerAdapter kik;
     public static String log;
-    public static ElectionPoll poll;
-    public static List<ElectionPoll.Candidate> candidates;
-    public static PingPongMatch universalMatch;
+    public static ElectionPoll poll; //todo remove
+    public static List<ElectionPoll.Candidate> candidates;//todo remove
+    public static PingPongMatch universalMatch;//todo remove
+    public static List<User> censoredUsers;
 
     public static void main(String[] args) throws LoginException, IOException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
@@ -62,6 +67,7 @@ public class main {
         }
         jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+
         Imperio = jda.getGuildById("606274842722959384");
 
         Imperio.loadMembers();
@@ -72,6 +78,7 @@ public class main {
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerPararelo());
+        loadCensored();
 
         System.out.println("tudopronto");
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
@@ -81,8 +88,28 @@ public class main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         mensagemfoda.delete().queue();
     }
+
+    public static boolean isTrusted(User user){
+        boolean is = false;
+        for(int q = 0; q < TRUSTED.length; q++){
+            if (user.getId().equalsIgnoreCase(TRUSTED[q])){is = true;}
+        }
+        return is;
+    }
+
+    public static boolean isTrusted(Member user){
+        return isTrusted(user.getUser());
+    }
+
+    public static void loadCensored(){
+        censoredUsers = new ArrayList<User>();
+        //todo
+    }
+
+
 
     public static void runPingPongMatch(GuildMessageReceivedEvent event) {
         universalMatch = new PingPongMatch(event);
@@ -154,36 +181,10 @@ public class main {
         }
     }
 
-    /*public class jogodavelhalistener extends ListenerAdapter {
-        public void onGuildMessageReceived (GuildMessageReceivedEvent ev){
-            Message mensagem = ev.getMessage();
-            String[] splitted = mensagem.getContentRaw().split(" ");
-            List<IMentionable> mentions = mensagem.getMentions();
-            if (splitted.length == 3 && mentions.size() == 1 && splitted[0].equalsIgnoreCase("-jogodavelha")) {
-                TextChannel canal = ev.getChannel();
-                canal.sendMessage(mentions.get(0).getAsMention() + "começado");
-                String jogo = "";
-                for (int t = 0; t < splitted.length; t++){
-
-                }
-            }
-        }
-    }*/
-    /*public class jogodavelha{
-        String n = "N";
-        String x = "X";
-        String o = "O"
-        String[][] legal = {{n},{n},{n}};
-
-        public jogodavelha(User J1, User J2){
-
-        }
-
-    }*/
-
     public static class eventListenerPararelo extends ListenerAdapter {
 
         public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+
             String[] rawSplit = event.getMessage().getContentRaw().split(" ");
 
             if (rawSplit[0].equalsIgnoreCase("ping") || rawSplit[0].equalsIgnoreCase("pong")) {
@@ -208,26 +209,40 @@ public class main {
 
     public static class seraQueEuLembroComoUsaEventListeners extends ListenerAdapter { //lembro?
 
+        public void onGuildVoiceJoin(final GuildVoiceJoinEvent event){
+            GuildVoiceState state = event.getVoiceState();
+            System.out.println("removendo o " + event.getMember().getEffectiveName() + " no server " + event.getGuild().getName());
+            if (state.inVoiceChannel() && censoredUsers.contains(event.getMember().getUser())){event.getGuild().kickVoiceMember(event.getMember()).queue();}
+        }
 
+        //receivers de mensagem principais
         public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
             Message message = event.getMessage();
+            Member member = event.getMember();
+            User user = event.getAuthor();
 
             if (!event.getMessage().getAuthor().isBot()) {
                 System.out.println("Pessoa: " + event.getAuthor().getName() + " Mensagem: " + message.getContentRaw());
                 log = log + "[" + event.getGuild().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + "]: " + event.getMessage().getContentRaw() + "\n";
             }
+            if(censoredUsers.contains(event.getAuthor())){
+                event.getMessage().delete().queue();
+                return;
+            }
 
 
-            TextChannel canalDoBot = jda.getTextChannelById("886685128762482800");
+            canalDoBot = jda.getTextChannelById("886685128762482800");
+            System.out.println("EMB: " + message.getAttachments().size());
+
             if (event.getChannel().getId().equals(canalDoBot.getId()) && message.getContentRaw().equalsIgnoreCase("-curva")) {
                 fazerUmaCurvaLegal(15, event.getChannel());
-            } else if (message.getContentRaw().split(" ")[0].equals("oi") && message.getMentionedUsers().contains(jda.getSelfUser())) {
+            } else if (message.getContentRaw().split(" ")[0].equalsIgnoreCase("oi") && message.getMentionedUsers().contains(jda.getSelfUser())) {
                 event.getChannel().sendMessage("oi " + event.getAuthor().getAsMention() + " :)").queue();
-            } else if (message.getContentRaw().equalsIgnoreCase("-enablelisteners") && event.getAuthor().getName().equalsIgnoreCase("Mega2223")) {
+            } else if (message.getContentRaw().equalsIgnoreCase("-enablelisteners") && isTrusted(user)) {
                 Perigosos = new listenersPerigosos();
                 jda.addEventListener(Perigosos);
                 event.getChannel().sendMessage(":thumbsup: ativados").queue();
-            } else if (message.getContentRaw().equalsIgnoreCase("-disablelisteners") && event.getAuthor().getName().equalsIgnoreCase("Mega2223")) {
+            } else if (message.getContentRaw().equalsIgnoreCase("-disablelisteners") && isTrusted(user)) {
                 jda.removeEventListener(Perigosos);
                 event.getChannel().sendMessage(":thumbsdown: desativados").queue();
             } else if (message.getContentRaw().equalsIgnoreCase("-tiraogames")) {
@@ -268,8 +283,8 @@ public class main {
 
                 if (rawSplit[0].equals("-volume")) {
                     if (rawSplit.length == 2) {
-                        if (Integer.parseInt(rawSplit[1]) >= 100 && !event.getAuthor().getId().equals(Mega2223ID)) {
-                            event.getChannel().sendMessage(":thumbsdown: Só o <@301424656051732491> pode colocar as coisas acima de 100 :(").queue();
+                        if (Integer.parseInt(rawSplit[1]) >= 100 && !isTrusted(user)) {
+                            event.getChannel().sendMessage(":thumbsdown: Só os membros confiados podem colocar as coisas acima de 100 :(").queue();
                         } else {
                             event.getChannel().sendMessage(":thumbsup: Bele vamo pra " + rawSplit[1] + " de volume então").queue();
                             fer.getGuildMusicManager(event.getGuild()).player.setVolume(Integer.parseInt(rawSplit[1]));
@@ -289,7 +304,7 @@ public class main {
                 } else if (rawSplit[0].equalsIgnoreCase("-status")) {
                     //jda.getPresence().set
                     //todo cavalo
-                } else if (rawSplit[0].equalsIgnoreCase("-mega") && rawSplit.length >= 2) {
+                } else if (rawSplit[0].equalsIgnoreCase("-mega") && rawSplit.length >= 2 && message.getAttachments().size() == 0) { //método de texto
                     String args = "";
                     for (int g = 1; g < rawSplit.length; g++) {
                         args = args + rawSplit[g] + " ";
@@ -297,15 +312,14 @@ public class main {
                     new notifier(event.getAuthor(), args);
                     event.getChannel().sendMessage("notifiquei o puto").queue();
 
-                } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) {
+                } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) { //todo concertaisso
                     try {
-                        new notifier(event.getAuthor(), message.getAttachments().get(0).retrieveAsIcon().get());
+                        new notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl()));
+                    } catch (IOException e) { e.printStackTrace();}
 
-                    } catch (InterruptedException e) {
-                    } catch (ExecutionException e) {
-                    }
+
                     event.getChannel().sendMessage("notifiquei o puto").queue();
-                } else if (message.getAuthor().getId().equalsIgnoreCase(Mega2223ID) && rawSplit[0].equals("-fala")) {
+                } else if (isTrusted(user) && rawSplit[0].equals("-fala")) {
                     String mensagem = "";
                     for (int ee = 1; ee < rawSplit.length; ee++) {
                         mensagem = mensagem + rawSplit[ee] + " ";
@@ -318,8 +332,8 @@ public class main {
                         && rawSplit[0].equals("-webhook")
                 ) {
                     List<Member> ment = event.getMessage().getMentionedMembers();
-                    Member user = ment.get(0);
-                    WebhookManager webhook = (WebhookManager) event.getChannel().createWebhook(user.getNickname()).complete();
+                    Member mentioned = ment.get(0);
+                    WebhookManager webhook = (WebhookManager) event.getChannel().createWebhook(mentioned.getNickname()).complete();
                     //try {
                     //webhook.setAvatar(getUserAvatar(event.getAuthor())); todo termina isso
                     //} catch (IOException e) {
@@ -334,7 +348,7 @@ public class main {
                     }
                     System.out.println("Argumentos de pingpong: " + rawSplit.length);
 
-                } else if (rawSplit[0].equalsIgnoreCase("-calaaboca") && event.getMember().getId().equals(Mega2223ID)) {
+                } else if (rawSplit[0].equalsIgnoreCase("-calaaboca") && isTrusted(user)) {
 
                     //String idDoBricks = "557722338033139760";
                     event.getMessage().delete().queue();
@@ -356,7 +370,7 @@ public class main {
                     }
 
                     event.getChannel().sendMessage("cala a boca " + mentionedMember.getEffectiveName());
-                } else if (event.getAuthor().getId().equals(Mega2223ID) && rawSplit[0].equalsIgnoreCase("-givelog")) {
+                } else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-givelog")) {
                     File logFile = new File(System.getProperty("user.dir") + "\\log.txt");
                     System.out.println("Salvando em: " + System.getProperty("user.dir") + "\\log.txt");
                     FileOutputStream inputStream;
@@ -398,7 +412,45 @@ public class main {
                         //poll = new ElectionPoll(new ArrayList<ElectionPoll.Candidate>());
                     }
                 }
+                else if (rawSplit[0].equalsIgnoreCase("-addfunny")){
+                    String name = rawSplit[1];
+                    //todo Image funny = (Image) message.getEmbeds().get(0).getImage();
+                }
+                else if (rawSplit[0].equalsIgnoreCase("-getfunny")){}
+                else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-1984")){
+                    List<Member> memberList = message.getMentionedMembers();
+                    for (int g = 0; g < memberList.size(); g++){
+                        censoredUsers.add(memberList.get(g).getUser());
+                        GuildVoiceState voice = memberList.get(g).getVoiceState();
+                        if(voice.inVoiceChannel()){event.getGuild().kickVoiceMember(memberList.get(g)).queue();}
+                    }
+                    event.getChannel().sendMessage("Ok ministro da verdade :thumbsup:").queue();
 
+
+                }
+
+                else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-2020")){
+                    List<Member> memberList = message.getMentionedMembers();
+                    for (int g = 0; g < memberList.size(); g++){
+                        censoredUsers.remove(memberList.get(g).getUser());
+                    }
+                    event.getChannel().sendMessage("Seus privilégios de fala foram restaurados").queue();
+                }
+
+                else if(rawSplit[0].equalsIgnoreCase("-liquidifica")){
+
+                    if(!isTrusted(user)){event.getChannel().sendMessage(":thumbsdown: Só o <@!" + Mega2223ID + "> e usuários confiados podem fazer isso").queue();}
+
+                    List<VoiceChannel> channels = event.getGuild().getVoiceChannels(); //todo varias vezes
+                    Member mentioned = event.getMessage().getMentionedMembers().get(0);
+                    VoiceChannel finals = mentioned.getVoiceState().getChannel();
+                    for (int g = 0; g<channels.size(); g++){
+                        VoiceChannel atual = channels.get(g);
+                        event.getGuild().moveVoiceMember(member, channels.get(g)).queue();
+                    }
+
+                    event.getGuild().moveVoiceMember(member, finals).queue();
+                }
 
             }
 
