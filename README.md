@@ -1,12 +1,12 @@
-## bot-de-beber-agua-2
+# bot-de-beber-agua-2
 
-# Bot de utilidades da República Nômade :)
+## Bot de utilidades da República Nômade :)
 
 Continuação do meu primeiro bot-de-beber-agua com mais coisas
 O bot foi feito principalmente pra RN, mas ele funciona em outros servidores
 Pode pegar os códigos que vc quiser
 
-# Comandos
+## Comandos
 
 -entra
 -vaza
@@ -29,7 +29,7 @@ Pode pegar os códigos que vc quiser
 -2020 [users] (só pra quem tem user confiado)
 -liquidifica [user] (só pra quem tem user confiado)
 
-problemas conhecidos:
+## Problemas conhecidos:
 ~o bot não consegue fazer duas partidas de pingpong ao mesmo tempo 
 ~documentação tá horrível
 ~2020 era pra ser 2021 tecnicamente
