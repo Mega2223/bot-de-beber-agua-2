@@ -1,12 +1,12 @@
 ## bot-de-beber-agua-2
 
-#Bot de utilidades da República Nômade :)
+# Bot de utilidades da República Nômade :)
 
 Continuação do meu primeiro bot-de-beber-agua com mais coisas
 O bot foi feito principalmente pra RN, mas ele funciona em outros servidores
 Pode pegar os códigos que vc quiser
 
-#Comandos
+# Comandos
 
 -entra
 -vaza
