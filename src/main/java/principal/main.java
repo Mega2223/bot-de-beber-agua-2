@@ -43,12 +43,10 @@ public class main {
     public static PlayerManager fer;
     public static ListenerAdapter kik;
     public static String log;
-    @Deprecated
-    public static ElectionPoll poll; //todo remove
-    @Deprecated
-    public static List<ElectionPoll.Candidate> candidates;//todo remove
+
     @Deprecated
     public static PingPongMatch universalMatch;//todo remove
+
     public static List<User> censoredUsers;
 
     public static void main(String[] args) throws LoginException, IOException {
@@ -424,23 +422,24 @@ public class main {
                     if (event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)) {
                         event.getChannel().sendMessage(":thumbsup:").queue();
                         Role cargo = event.getMessage().getMentionedRoles().get(0);
+                        List<ElectionPoll.Candidate> candidates;
                         candidates = new ArrayList<ElectionPoll.Candidate>();
                         for (int g = 0; g < event.getMessage().getMentionedMembers().size(); g++) {
                             Member atual = event.getMessage().getMentionedMembers().get(g);
                             candidates.add(new ElectionPoll.Candidate(event.getMember(), event.getMember().getEffectiveName()));
                         }
-                        poll = new ElectionPoll(candidates, cargo);
+                        //fixme poll = new ElectionPoll(candidates, cargo);
 
                     }
                 } else if (rawSplit[0].equalsIgnoreCase("-endPoll")){
                     ElectionPoll.Candidate winner;
-                    List<ElectionPoll.Candidate> runPol = poll.runPoll();
+                    /*fixme List<ElectionPoll.Candidate> runPol = poll.runPoll();
                     if(runPol.size() == 1){
                         winner = runPol.get(0);
                     } else
                     {
                         //poll = new ElectionPoll(new ArrayList<ElectionPoll.Candidate>());
-                    }
+                    }*/
                 }
                 else if (rawSplit[0].equalsIgnoreCase("-addfunny")){
                     String name = rawSplit[1];
