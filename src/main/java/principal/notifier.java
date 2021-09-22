@@ -22,8 +22,8 @@ public class notifier extends JFrame {
         //System.out.println("cabeid");
 
 
-        setVisible(true);
-        setSize(180, 80);
+        ;
+        //setSize(180, 80);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
         setAlwaysOnTop(true);
@@ -56,8 +56,8 @@ public class notifier extends JFrame {
             System.out.println("NULL PORRA");
         }
         ImageIcon imgIcon = new ImageIcon(bImg);
-        System.out.println("imgIcon: "+imgIcon.getIconHeight() + ":" + imgIcon.getIconWidth());
-        System.out.println("Icon: "+((Icon)imgIcon).getIconHeight() + ":" + ((Icon)imgIcon).getIconWidth());
+        //System.out.println("imgIcon: "+imgIcon.getIconHeight() + ":" + imgIcon.getIconWidth());
+        //System.out.println("Icon: "+((Icon)imgIcon).getIconHeight() + ":" + ((Icon)imgIcon).getIconWidth());
 
         label2 = new JLabel((Icon)imgIcon);
         label2.setIcon(imgIcon);
@@ -69,8 +69,10 @@ public class notifier extends JFrame {
         setName(user.getName());
         setTitle(user.getName() + ":");
         ImageIcon iC = new ImageIcon(bImg);
+
         setSize(iC.getIconWidth(),iC.getIconHeight() + 20); //todo pega a medida da barra
-        System.out.println("cabei");
+        setVisible(true);
+        //System.out.println("cabei");
     }
 
     int x;

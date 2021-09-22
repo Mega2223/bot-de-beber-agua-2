@@ -43,8 +43,11 @@ public class main {
     public static PlayerManager fer;
     public static ListenerAdapter kik;
     public static String log;
+    @Deprecated
     public static ElectionPoll poll; //todo remove
+    @Deprecated
     public static List<ElectionPoll.Candidate> candidates;//todo remove
+    @Deprecated
     public static PingPongMatch universalMatch;//todo remove
     public static List<User> censoredUsers;
 
@@ -104,11 +107,38 @@ public class main {
         return isTrusted(user.getUser());
     }
 
-    public static void loadCensored(){
+
+
+    public static void loadCensored() throws IOException {
+        File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
+        System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt");
+
         censoredUsers = new ArrayList<User>();
-        //todo
+        DataInputStream reader;
+        try{
+        reader = new DataInputStream(new FileInputStream(logFile));} catch (FileNotFoundException e){e.printStackTrace(); return;}
+        String[] banned = reader.readUTF().split(" ");
+
+        for(int g =0; g < banned.length; g++){
+            String atual = banned[g];
+            System.out.println("Adicionando o user " + jda.getUserById(atual).getName() + " à lista de users banidos");
+            //censoredUsers.add(jda.getUserById(atual));
+        }
+
     }
 
+    public static boolean addToCensoredFile(User userrr) throws IOException {
+        FileOutputStream inputStreamm;
+        File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
+        System.out.println("Adicionando um user para a lista em: " + System.getProperty("user.dir") + "\\banList.txt");
+        try {
+            inputStreamm = new FileOutputStream(logFile);
+        } catch (FileNotFoundException e) {return false;}
+
+        OutputStreamWriter writerr = new OutputStreamWriter(inputStreamm);
+        writerr.write(" " + userrr.getId());
+        return true;
+    }
 
 
     public static void runPingPongMatch(GuildMessageReceivedEvent event) {
@@ -211,8 +241,8 @@ public class main {
 
         public void onGuildVoiceJoin(final GuildVoiceJoinEvent event){
             GuildVoiceState state = event.getVoiceState();
-            System.out.println("removendo o " + event.getMember().getEffectiveName() + " no server " + event.getGuild().getName());
-            if (state.inVoiceChannel() && censoredUsers.contains(event.getMember().getUser())){event.getGuild().kickVoiceMember(event.getMember()).queue();}
+
+            if (state.inVoiceChannel() && censoredUsers.contains(event.getMember().getUser())){event.getGuild().kickVoiceMember(event.getMember()).queue();System.out.println("removendo o " + event.getMember().getEffectiveName() + " no server " + event.getGuild().getName());}
         }
 
         //receivers de mensagem principais
@@ -232,7 +262,7 @@ public class main {
 
 
             canalDoBot = jda.getTextChannelById("886685128762482800");
-            System.out.println("EMB: " + message.getAttachments().size());
+            //System.out.println("EMB: " + message.getAttachments().size());
 
             if (event.getChannel().getId().equals(canalDoBot.getId()) && message.getContentRaw().equalsIgnoreCase("-curva")) {
                 fazerUmaCurvaLegal(15, event.getChannel());
@@ -423,6 +453,11 @@ public class main {
                         censoredUsers.add(memberList.get(g).getUser());
                         GuildVoiceState voice = memberList.get(g).getVoiceState();
                         if(voice.inVoiceChannel()){event.getGuild().kickVoiceMember(memberList.get(g)).queue();}
+                    }
+                    try {
+                        addToCensoredFile(user);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                     event.getChannel().sendMessage("Ok ministro da verdade :thumbsup:").queue();
 
