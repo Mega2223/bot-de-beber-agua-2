@@ -81,7 +81,7 @@ public class main {
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerPararelo());
-        loadCensored();
+         loadCensored();
 
         System.out.println("tudopronto");
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
@@ -114,6 +114,7 @@ public class main {
         System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt");
 
         censoredUsers = new ArrayList<User>();
+        if(true){return;}//fixme
         DataInputStream reader;
         try{
         reader = new DataInputStream(new FileInputStream(logFile));} catch (FileNotFoundException e){e.printStackTrace(); return;}
@@ -474,7 +475,7 @@ public class main {
                     event.getChannel().sendMessage("Seus privilégios de fala foram restaurados").queue();
                 }
 
-                else if(rawSplit[0].equalsIgnoreCase("-liquidifica")){
+                else if(rawSplit[0].equalsIgnoreCase("-liquidifica") && isTrusted(event.getAuthor())){
 
                     if(!isTrusted(user)){event.getChannel().sendMessage(":thumbsdown: Só o <@!" + Mega2223ID + "> e usuários confiados podem fazer isso").queue();}
 
