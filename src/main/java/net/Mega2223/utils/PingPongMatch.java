@@ -1,4 +1,4 @@
-package utils;
+package net.Mega2223.utils;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;

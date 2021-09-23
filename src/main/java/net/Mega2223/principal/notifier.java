@@ -1,4 +1,4 @@
-package principal;
+package net.Mega2223.principal;
 
 import net.dv8tion.jda.api.entities.User;
 import sun.misc.BASE64Decoder;

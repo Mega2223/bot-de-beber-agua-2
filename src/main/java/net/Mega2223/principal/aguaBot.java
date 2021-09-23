@@ -1,4 +1,4 @@
-package principal;
+package net.Mega2223.principal;
 
 import lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.JDA;
@@ -18,8 +18,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import sun.misc.Launcher;
-import utils.ElectionPoll;
-import utils.PingPongMatch;
+import net.Mega2223.utils.ElectionPoll;
+import net.Mega2223.utils.PingPongMatch;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
@@ -31,7 +31,7 @@ import java.time.Instant;
 import java.util.*;
 
 @SuppressWarnings("ALL")
-public class main {
+public class aguaBot {
 
     public static final String Mega2223ID = "301424656051732491";
     public static final String PudimAtomicoID = "491748519984627712";
