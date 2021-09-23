@@ -403,7 +403,7 @@ public class main {
                     event.getChannel().sendMessage(mensagem).queue();
                     event.getMessage().delete().queue();
 
-                } else if (isTrusted(event.getMember()) && rawSplit[0].equalsIgnoreCase("-cleanlogs")){
+                } else if (isTrusted(event.getAuthor()) && rawSplit[0].equalsIgnoreCase("-cleanlogs")){
                     try {
                         writeInLog("");
                         event.getChannel().sendMessage("deletados").queue();
@@ -455,7 +455,7 @@ public class main {
                     }
 
                     event.getChannel().sendMessage("cala a boca " + mentionedMember.getEffectiveName());
-                } else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-givelog")) {
+                } else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-givelogs")) {
 
                     System.out.println("Salvando em: " + LOG_PATH);
 
