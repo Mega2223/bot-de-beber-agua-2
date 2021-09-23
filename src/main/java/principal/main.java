@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
@@ -29,11 +31,13 @@ import java.net.URLConnection;
 import java.time.Instant;
 import java.util.*;
 
+@SuppressWarnings("ALL")
 public class main {
 
     public static final String Mega2223ID = "301424656051732491";
     public static final String PudimAtomicoID = "491748519984627712";
     public static final String[] TRUSTED = {Mega2223ID,PudimAtomicoID};
+    public static final String LOG_PATH = System.getProperty("user.dir") + "\\log.txt";
     public static JDABuilder builder;
     public static JDA jda;
     public static TextChannel canalDoBot;
@@ -58,7 +62,7 @@ public class main {
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.enableCache(CacheFlag.ACTIVITY);
         jda = builder.build();
-
+        log = loadLog() + "\n";
 
         try {/*Thread.sleep(7000);*/
             jda.awaitReady();
@@ -78,6 +82,7 @@ public class main {
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerParalelo());
+        jda.addEventListener(new listenersDoLog());
          loadCensored();
 
         System.out.println("tudopronto");
@@ -214,6 +219,14 @@ public class main {
 
     public static class eventListenerParalelo extends ListenerAdapter {
 
+        public void onGuildVoiceJoin(GuildVoiceJoinEvent event){
+            System.out.println(event.getMember().getEffectiveName() + " entrou no canal " + event.getChannelJoined().getName());
+        }
+
+        public void onGuildVoiceLeave(GuildVoiceLeaveEvent event){
+            System.out.println(event.getMember().getEffectiveName() + " saiu do canal " + event.getChannelLeft().getName());
+        }
+
         public void onPrivateMessageReceived(PrivateMessageReceivedEvent event){
             if(event.getAuthor().isBot()){return; }
             if(isTrusted(event.getAuthor())){
@@ -255,6 +268,18 @@ public class main {
             }
         }
 
+
+    }
+
+    public static class listenersDoLog extends ListenerAdapter{
+
+
+        public void onGuildVoiceJoin(GuildVoiceJoinEvent ev){
+            log = log + "[" + ev.getMember().getUser().getName() + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
+        }
+        public void onGuildVoiceLeave(GuildVoiceLeaveEvent ev){
+            log = log + "[" + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
+        }
 
     }
 
@@ -378,6 +403,15 @@ public class main {
                     event.getChannel().sendMessage(mensagem).queue();
                     event.getMessage().delete().queue();
 
+                } else if (isTrusted(event.getMember()) && rawSplit[0].equalsIgnoreCase("-cleanlogs")){
+                    try {
+                        writeInLog("");
+                        event.getChannel().sendMessage("deletados").queue();
+                    } catch (FileNotFoundException e) {
+                        event.getChannel().sendMessage("não achei os arquivos, chama o <!@" + Mega2223ID + "> pra ver oq rolou").queue();
+                        e.printStackTrace();
+                    }
+
                 } else if (message.getAuthor().getId().equals(Mega2223ID)
                         && event.getMessage().getMentionedMembers().size() > 1
                         && rawSplit[0].equals("-webhook")
@@ -422,25 +456,21 @@ public class main {
 
                     event.getChannel().sendMessage("cala a boca " + mentionedMember.getEffectiveName());
                 } else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-givelog")) {
-                    File logFile = new File(System.getProperty("user.dir") + "\\log.txt");
-                    System.out.println("Salvando em: " + System.getProperty("user.dir") + "\\log.txt");
-                    FileOutputStream inputStream;
+
+                    System.out.println("Salvando em: " + LOG_PATH);
+
                     try {
-                        inputStream = new FileOutputStream(logFile);
+                        writeInLog(log);
                     } catch (FileNotFoundException e) {
-                        event.getChannel().sendMessage("excedi").queue();
-                        return;
-                    }
-
-                    OutputStreamWriter writer = new OutputStreamWriter(inputStream);
-
-                    try {
-                        writer.write(log);
-                        writer.close();
-                    } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    event.getChannel().sendFile(logFile, "log.txt").queue();
+
+
+
+                    System.out.println("Pegando file de "+LOG_PATH);
+                    File filo = new File(LOG_PATH);
+                    event.getChannel().sendFile(filo , "log.txt").queue();
+
                 } else if (rawSplit[0].equalsIgnoreCase("-startPoll")) {
                     if (event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)) {
                         event.getChannel().sendMessage(":thumbsup:").queue();
@@ -591,5 +621,32 @@ public class main {
 
     }
 
+    public static String loadLog() throws IOException {
+        String retorno = "";
+        File ret = new File(LOG_PATH);
+        BufferedReader iStream = new BufferedReader(new InputStreamReader(new FileInputStream(ret)));
+        String e = "";
+        while (e != null){
+            e = iStream.readLine();
+            retorno = retorno + e + "\n";
+        }
+        iStream.close();
+        //System.out.println(retorno);
+        return retorno;
+    }
+
+    public static void writeInLog(String what) throws FileNotFoundException {
+        System.out.println("writeInLog chamado");
+        System.out.println(LOG_PATH);
+        OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File(LOG_PATH)));
+
+        try {
+            writer.write(what);
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
