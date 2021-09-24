@@ -39,7 +39,9 @@ Continuação do meu primeiro bot-de-beber-agua com mais coisas.
 
 -shutdown (só eu posso usar)
 
--givelog (só pra quem tem user confiado)
+-givelogs (só pra quem tem user confiado)
+
+-cleanlogs (só pra quem tem user confiado)
 
 -calaaboca [user] [nº de mensagens] (só pra quem tem user confiado)
 
@@ -48,6 +50,18 @@ Continuação do meu primeiro bot-de-beber-agua com mais coisas.
 -2020 [users] (só pra quem tem user confiado)
 
 -liquidifica [user] (só pra quem tem user confiado)
+
+-givepm (só pra quem tem user confiado)
+
+-manda [mensagem] (só pra quem tem user confiado)
+
+-move [id do canal] (só pra quem tem user confiado)
+
+-addproperty[argumento] [valor] (só pra quem tem user confiado)
+
+-removeproperty[argumento] (só pra quem tem user confiado)
+
+-getproperties (só pra quem tem user confiado)
 
 ## Problemas conhecidos:
 
