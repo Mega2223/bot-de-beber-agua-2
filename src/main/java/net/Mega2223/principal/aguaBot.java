@@ -1,6 +1,8 @@
 package net.Mega2223.principal;
 
 import lavaplayer.PlayerManager;
+import net.Mega2223.utils.ElectionPoll;
+import net.Mega2223.utils.PingPongMatch;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -18,8 +20,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import sun.misc.Launcher;
-import net.Mega2223.utils.ElectionPoll;
-import net.Mega2223.utils.PingPongMatch;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
@@ -33,10 +33,11 @@ import java.util.*;
 @SuppressWarnings("ALL")
 public class aguaBot {
 
-    public static final String Mega2223ID = "301424656051732491";
-    public static final String PudimAtomicoID = "491748519984627712";
-    public static final String[] TRUSTED = {Mega2223ID, PudimAtomicoID};
+
     public static final String LOG_PATH = System.getProperty("user.dir") + "\\log.txt";
+    public static final String PROPERTIES_PATH = System.getProperty("user.dir") + "\\configs.properties";
+    public static final String Mega2223ID = "301424656051732491";
+    public static List<String> TRUSTED;
     public static JDABuilder builder;
     public static JDA jda;
     public static TextChannel canalDoBot;
@@ -45,6 +46,8 @@ public class aguaBot {
     public static PlayerManager fer;
     public static ListenerAdapter kik;
     public static String log;
+    public static Properties properties;
+
 
     @Deprecated
     public static PingPongMatch universalMatch;//todo remove
@@ -69,11 +72,29 @@ public class aguaBot {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        loadCensored();
+        loadProperties();
+
+        saveProperties(properties);
+
         jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
         Imperio = jda.getGuildById("606274842722959384");
+        TRUSTED = new ArrayList<String>();
+        String trustedUsers[] = properties.getProperty("trusted").split(",");
+        for (int us = 0; /*referencia among us*/ us < trustedUsers.length; us++) {
+            String trustedAct = trustedUsers[us];
+            if (trustedAct == null) {
+                break;
+            }
+            TRUSTED.add(trustedAct);
+            System.out.println("User confiado carregado: " + jda.getUserById(trustedAct).getName());
+            //System.out.println(isTrusted(jda.getUserById(trustedAct)));
+        }
 
+        System.out.println(isTrusted(jda.getUserById("491748519984627712")) + " pudins");
         Imperio.loadMembers();
         Imperio.getMemberCache();
 
@@ -83,7 +104,6 @@ public class aguaBot {
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
-        loadCensored();
 
         System.out.println("tudopronto");
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
@@ -115,7 +135,7 @@ public class aguaBot {
 
     public static void loadCensored() throws IOException {
         File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
-        System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt");
+        System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt"); //todo coloca isso no config
 
         censoredUsers = new ArrayList<>();
         if (true) {
@@ -168,7 +188,7 @@ public class aguaBot {
 
     public static BufferedImage getUserAvatar(User user) throws IOException {
         URLConnection connection = new URL(user.getAvatarUrl() != null ? user.getAvatarUrl() : user.getDefaultAvatarUrl()).openConnection();
-        connection.setRequestProperty("User-Agent", "bot emily-bot");
+        connection.setRequestProperty("User-Agent", "bot emily-bot"); //fixme wtf de onde veio isso
         BufferedImage profileImg;
         try {
             profileImg = ImageIO.read(connection.getInputStream());
@@ -221,6 +241,78 @@ public class aguaBot {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Properties loadProperties() throws IOException {
+
+        File props;
+
+        FileInputStream inputStream2;
+        FileOutputStream outputStream2;
+        InputStreamReader streamReader2;
+        BufferedReader bufferedReader;
+        boolean deuInput = false;
+        props = new File(PROPERTIES_PATH);
+        try {
+
+            inputStream2 = new FileInputStream(props);
+            deuInput = true;
+        } catch (FileNotFoundException ex) {
+            //outputStream2 = o
+            try {
+                outputStream2 = new FileOutputStream(new File(PROPERTIES_PATH));
+                inputStream2 = new FileInputStream(props);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        streamReader2 = new InputStreamReader(inputStream2);
+        bufferedReader = new BufferedReader(streamReader2);
+
+        String currentLine = bufferedReader.readLine();
+        String propsss[] = {};
+        Properties ret = new Properties();
+
+        while (currentLine != null) {
+            //System.out.println("cuurr: " + currentLine);
+            propsss = currentLine.split("=");
+            if (propsss.length > 1) {
+                ret.put(propsss[0], propsss[1]);
+                System.out.println("Registrando propriedade " + propsss[0] + ":" + propsss[1]);
+            }
+
+            currentLine = bufferedReader.readLine();
+        }
+
+        properties = ret;
+
+        System.out.println(properties.size() + "auiiiaiaiia");
+
+        return properties;
+    }
+
+    public static void saveProperties(Properties toWhat) throws IOException {
+
+        File props;
+
+        FileInputStream inputStream2;
+        FileOutputStream outputStream2;
+        props = new File(PROPERTIES_PATH);
+        try {
+            outputStream2 = new FileOutputStream(new File(PROPERTIES_PATH));
+            inputStream2 = new FileInputStream(props);
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return;
+        }
+
+        toWhat.store(outputStream2, null);
+        properties = toWhat;
+
     }
 
     public static class listenersPerigosos extends ListenerAdapter {
@@ -394,7 +486,7 @@ public class aguaBot {
                 fer.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
             } else if (rawSplit[0].equals("-volume")) {
                 if (rawSplit.length == 2) {
-                    if (Integer.parseInt(rawSplit[1]) >= 100 && !isTrusted(user)) {
+                    if (Integer.parseInt(rawSplit[1]) > 100 && !isTrusted(user)) {
                         event.getChannel().sendMessage(":thumbsdown: Só os membros confiados podem colocar as coisas acima de 100 :(").queue();
                     } else {
                         event.getChannel().sendMessage(":thumbsup: Bele vamo pra " + rawSplit[1] + " de volume então").queue();
@@ -661,6 +753,38 @@ public class aguaBot {
                     Member atual = voice.getMembers().get(f);
                     gui.moveVoiceMember(atual, voice2).queue();
                 }
+            } else if (rawSplit[0].equalsIgnoreCase("-addproperty")) {
+
+                try {
+                    String argName = rawSplit[1];
+                    String argValue = rawSplit[2];
+                    properties.put(argName, argValue);
+                    saveProperties(properties);
+                    event.getChannel().sendMessage("ok coloquei :thumbsup:").queue();
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    event.getChannel().sendMessage("Deu algo errado, vê se os arrays tão certos").queue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (rawSplit[0].equalsIgnoreCase("-removeproperty")) {
+                try {
+                    properties.remove(rawSplit[1]);
+                    saveProperties(properties);
+                    event.getChannel().sendMessage("ok apaguei :thumbsup:").queue();
+                } catch (ArrayIndexOutOfBoundsException | IOException ex) {
+                    event.getChannel().sendMessage("identação errada seu trouxa").queue();
+                }
+
+            } else if (rawSplit[0].equalsIgnoreCase("-getproperties")) {
+                String fala = "";
+                for (int f = 0; f < properties.size(); f++) {
+                    String act = properties.stringPropertyNames().stream().toArray()[f].toString();
+                    fala = fala + act + "=" + properties.get(act) + "\n";
+
+                }
+                event.getAuthor().openPrivateChannel().complete().sendMessage(fala).queue();
+
             }
 
         }
