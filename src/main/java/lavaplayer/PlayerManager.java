@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
+import java.awt.dnd.InvalidDnDOperationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -81,8 +82,8 @@ public class PlayerManager {
 
             @Override
             public void noMatches() {
-                channel.sendMessage("Não achei nada com esse link, cê digitou certo? Olha: " + trackUrl).queue();
-
+                //channel.sendMessage("Não achei nada com esse link, cê digitou certo? Olha: " + trackUrl).queue();
+                throw new InvalidDnDOperationException();
             }
 
             @Override

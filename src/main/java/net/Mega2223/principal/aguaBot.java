@@ -1,8 +1,21 @@
 package net.Mega2223.principal;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.GenericJson;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.JsonGenerator;
+import com.google.api.client.json.JsonParser;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.YouTube.Builder;
 import lavaplayer.PlayerManager;
+
 import net.Mega2223.utils.ElectionPoll;
 import net.Mega2223.utils.PingPongMatch;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -19,16 +32,22 @@ import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+
+
 import sun.misc.Launcher;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.*;
+
+import com.google.api.services.youtube.*;
 
 @SuppressWarnings("ALL")
 public class aguaBot {
@@ -37,6 +56,7 @@ public class aguaBot {
     public static final String LOG_PATH = System.getProperty("user.dir") + "\\log.txt";
     public static final String PROPERTIES_PATH = System.getProperty("user.dir") + "\\configs.properties";
     public static final String Mega2223ID = "301424656051732491";
+    public static YouTube youtube; //wtf
     public static List<String> TRUSTED;
     public static JDABuilder builder;
     public static JDA jda;
@@ -47,19 +67,24 @@ public class aguaBot {
     public static ListenerAdapter kik;
     public static String log;
     public static Properties properties;
-
-
+    public static String JDAKey;
+    public static String YoutubeKey;
+    public static Builder YTbuilder;
+    public static List<notifier> Notifiers;
     @Deprecated
     public static PingPongMatch universalMatch;//todo remove
 
     public static List<User> censoredUsers;
 
-    public static void main(String[] args) throws LoginException, IOException {
+    public static void main(String[] args) throws LoginException, IOException, InstantiationException, IllegalAccessException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
-        @SuppressWarnings("deprecated")
         String key = inputStream.readLine();
-        System.out.println("Ativando na key " + key);
-        builder = JDABuilder.create(key, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
+        JDAKey = key.split(" ")[0];
+        YoutubeKey = key.split(" ")[1];
+        //youtube = buildYoutube(YoutubeKey);
+
+        System.out.println("Ativando o JDA na key " + JDAKey);
+        builder = JDABuilder.create(JDAKey, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
         EnumSet<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS);
         builder.enableIntents(intents);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
@@ -83,7 +108,9 @@ public class aguaBot {
 
         Imperio = jda.getGuildById("606274842722959384");
         TRUSTED = new ArrayList<String>();
+        Notifiers = new ArrayList<notifier>();
         String trustedUsers[] = properties.getProperty("trusted").split(",");
+
         for (int us = 0; /*referencia among us*/ us < trustedUsers.length; us++) {
             String trustedAct = trustedUsers[us];
             if (trustedAct == null) {
@@ -91,10 +118,8 @@ public class aguaBot {
             }
             TRUSTED.add(trustedAct);
             System.out.println("User confiado carregado: " + jda.getUserById(trustedAct).getName());
-            //System.out.println(isTrusted(jda.getUserById(trustedAct)));
         }
 
-        System.out.println(isTrusted(jda.getUserById("491748519984627712")) + " pudins");
         Imperio.loadMembers();
         Imperio.getMemberCache();
 
@@ -289,7 +314,7 @@ public class aguaBot {
 
         properties = ret;
 
-        System.out.println(properties.size() + "auiiiaiaiia");
+        System.out.println(properties.size() + " propriedades carregadas");
 
         return properties;
     }
@@ -466,7 +491,6 @@ public class aguaBot {
             } else if (contentRaw.equalsIgnoreCase("-vaza")) {
                 event.getChannel().sendMessage(":thumbsup: tá").queue();
                 event.getGuild().getAudioManager().closeAudioConnection();
-
             } else if (rawSplit[0].equalsIgnoreCase("-toca")) {//todo split
                 event.getChannel().sendMessage(":thumbsup: tocarei-de-eu").queue();
 
@@ -476,8 +500,10 @@ public class aguaBot {
                 //final AudioPlayerManager manager = new DefaultAudioPlayerManager();
                 //final AudioPlayer player = manager.createPlayer();
 
+                try { fer.loadAndPlay(event.getChannel(), rawSplit[1]);}catch (InvalidDnDOperationException e){
 
-                fer.loadAndPlay(event.getChannel(), rawSplit[1]);
+
+                }
 
 
             } else if (rawSplit[0].equals("-skip")) {
@@ -512,12 +538,12 @@ public class aguaBot {
                 for (int g = 1; g < rawSplit.length; g++) {
                     args = args + rawSplit[g] + " ";
                 }
-                new notifier(event.getAuthor(), args);
+                Notifiers.add(new notifier(event.getAuthor(), args));
                 event.getChannel().sendMessage("notifiquei o puto").queue();
 
             } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) { //todo concertaisso
                 try {
-                    new notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl()));
+                    Notifiers.add(new notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl())));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -776,7 +802,7 @@ public class aguaBot {
                     event.getChannel().sendMessage("identação errada seu trouxa").queue();
                 }
 
-            } else if (rawSplit[0].equalsIgnoreCase("-getproperties")) {
+            } else if (rawSplit[0].equalsIgnoreCase("-getproperties") && isTrusted(event.getAuthor())) {
                 String fala = "";
                 for (int f = 0; f < properties.size(); f++) {
                     String act = properties.stringPropertyNames().stream().toArray()[f].toString();
@@ -785,10 +811,51 @@ public class aguaBot {
                 }
                 event.getAuthor().openPrivateChannel().complete().sendMessage(fala).queue();
 
+            } else if (rawSplit[0].equalsIgnoreCase("-giveservers") && isTrusted(event.getAuthor())){
+                String out = "";
+                for(int g = 0; g < jda.getGuilds().size(); g++){
+                    System.out.println(g+"/"+jda.getGuilds().size());
+                    Guild atual = jda.getGuilds().get(g);
+                    out = out + "**" + atual.getName() + ":** " + atual.getMembers().size() + " membros \n";
+                }
+
+                System.out.print(out);
+                event.getChannel().sendMessage(out).queue();
+            } else if (rawSplit[0].equalsIgnoreCase("-cleannotifiers")&&event.getAuthor().getId().equals(Mega2223ID)){
+                for (int f =0; f < Notifiers.size(); f++) {
+                    Notifiers.get(f).dispose();
+
+                }
+                Notifiers.clear();
+
             }
 
         }
 
+    }
+
+
+    //fixme
+    public static YouTube buildYoutube(final String youtubeKey) throws IllegalAccessException, InstantiationException {
+
+        HttpTransport transport = new NetHttpTransport();
+
+        JsonFactory fac = new GenericJson().getFactory();
+
+        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
+
+
+        HttpRequestInitializer initializer = new HttpRequestInitializer() {
+            @Override
+            public void initialize(HttpRequest httpRequest) throws IOException {
+
+            }
+        };
+
+        YTbuilder = new Builder(transport,fac,initializer);
+        //YTbuilder.set
+        YouTube yt = YTbuilder.build();
+        return yt;
     }
 
 }
