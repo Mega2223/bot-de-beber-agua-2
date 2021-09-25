@@ -11,6 +11,7 @@ import com.google.api.client.json.JsonGenerator;
 import com.google.api.client.json.JsonParser;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTube.Builder;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import lavaplayer.PlayerManager;
 
 import net.Mega2223.utils.ElectionPoll;
@@ -38,14 +39,19 @@ import sun.misc.Launcher;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
+import java.awt.*;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.*;
+import java.util.List;
 
 import com.google.api.services.youtube.*;
 
@@ -73,7 +79,7 @@ public class aguaBot {
     public static Builder YTbuilder;
     public static List<notifier> Notifiers;
     @Deprecated
-    public static PingPongMatch universalMatch;//todo remove
+    public static List <PingPongMatch> universalMatches;
 
     public static List<User> censoredUsers;
 
@@ -99,7 +105,6 @@ public class aguaBot {
             e.printStackTrace();
         }
 
-        loadCensored();
         loadProperties();
 
         saveProperties(properties);
@@ -110,28 +115,11 @@ public class aguaBot {
         Imperio = jda.getGuildById("606274842722959384");
         TRUSTED = new ArrayList<String>();
         BOTBANNED = new ArrayList<String>();
+        censoredUsers = new ArrayList<User>();//eu sou mt consistente nas capslocks ne pqp
         Notifiers = new ArrayList<notifier>();
-        String trustedUsers[] = properties.getProperty("trusted").split(",");
 
-        for (int us = 0; /*referencia among us*/ us < trustedUsers.length; us++) {
-            String trustedAct = trustedUsers[us];
-            if (trustedAct == null) {
-                break;
-            }
-            TRUSTED.add(trustedAct);
-            System.out.println("User confiado carregado: " + jda.getUserById(trustedAct).getName());
-        }
 
-        String bannedUsers[] = properties.getProperty("banned").split(",");
-
-        for (int us = 0; /*referencia among us*/ us < bannedUsers.length; us++) {
-            String bannedAct = bannedUsers[us];
-            if (bannedAct == null) {
-                break;
-            }
-            BOTBANNED.add(bannedAct);
-            System.out.println("User banido carregado: " + jda.getUserById(bannedAct).getName());
-        }
+        initalizeLists();
 
         Imperio.loadMembers();
         Imperio.getMemberCache();
@@ -187,30 +175,7 @@ public class aguaBot {
     }
 
 
-    public static void loadCensored() throws IOException {
-        File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
-        System.out.println("Pegando ids banidos em: " + System.getProperty("user.dir") + "\\banList.txt"); //todo coloca isso no config
 
-        censoredUsers = new ArrayList<>();
-        if (true) {
-            return;
-        }//fixme
-        DataInputStream reader;
-        try {
-            reader = new DataInputStream(new FileInputStream(logFile));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return;
-        }
-        String[] banned = reader.readUTF().split(" ");
-
-        for (int g = 0; g < banned.length; g++) {
-            String atual = banned[g];
-            System.out.println("Adicionando o user " + jda.getUserById(atual).getName() + " à lista de users banidos");
-            //censoredUsers.add(jda.getUserById(atual));
-        }
-
-    }
 
     public static boolean addToCensoredFile(User userrr) throws IOException {
         FileOutputStream inputStreamm;
@@ -229,27 +194,37 @@ public class aguaBot {
 
 
     public static void runPingPongMatch(GuildMessageReceivedEvent event) {
-        universalMatch = new PingPongMatch(event);
+        universalMatches.add(new PingPongMatch(event));
     }
 
     public static void runPingPongMatch(GuildMessageReceivedEvent event, int intervaloNumerico, int jogadas) {
-        universalMatch = new PingPongMatch(event, intervaloNumerico, jogadas);
+        universalMatches.add(new PingPongMatch(event, intervaloNumerico, jogadas));
     }
 
-    public static void updatePingPongMatch(GuildMessageReceivedEvent event) {
-        universalMatch.refute(event);
-    }
+    public static void updatePingPongMatches(GuildMessageReceivedEvent event) throws InvalidArgumentException { //lembrando que tem que ter confirmação que o user tá jogando
 
-    public static BufferedImage getUserAvatar(User user) throws IOException {
-        URLConnection connection = new URL(user.getAvatarUrl() != null ? user.getAvatarUrl() : user.getDefaultAvatarUrl()).openConnection();
-        connection.setRequestProperty("User-Agent", "bot emily-bot"); //fixme wtf de onde veio isso
-        BufferedImage profileImg;
-        try {
-            profileImg = ImageIO.read(connection.getInputStream());
-        } catch (Exception ignored) {
-            profileImg = ImageIO.read(Objects.requireNonNull(Launcher.class.getClassLoader().getResource("default_profile.jpg")));
+
+
+
+        if(!isPlaying(event.getAuthor())){throw new InvalidArgumentException(new String[]{"o user n tá jogando o cabaço"});
         }
-        return profileImg;
+
+        int isPl = getPlaying(event);
+        universalMatches.get(isPl).refute(event);
+
+    }
+
+    public static int getPlaying(GuildMessageReceivedEvent event){
+        if(!isPlaying(event.getAuthor())){throw new IllegalArgumentException("ele não tá jogando cabaço");}
+        int isPl = 0;
+        String EID = event.getAuthor().getId();
+        while (isPl < universalMatches.size()){
+            PingPongMatch AT = universalMatches.get(isPl);
+            String IDES = AT.U1.getId() + " " +AT.U2.getId();
+            if(IDES.contains(EID)){ break;} else {isPl++;}
+        }
+
+        return isPl;
     }
 
     public static void fazerUmaCurvaLegal(int numberOfSpaces, TextChannel canalDoBot) {
@@ -435,15 +410,17 @@ public class aguaBot {
             String[] rawSplit = event.getMessage().getContentRaw().split(" ");
 
             if (rawSplit[0].equalsIgnoreCase("ping") || rawSplit[0].equalsIgnoreCase("pong")) {
-                System.out.println("==========================");
-                System.out.println("RESPOSTA PING IDENTIFICADA");
-                System.out.println(event.getAuthor().getId() + "?=" + universalMatch.U1.getId() + " " + universalMatch.U2.getId());
+                //System.out.println("==========================");
+                //System.out.println("RESPOSTA PING IDENTIFICADA");
+                //System.out.println(event.getAuthor().getId() + "?=" + universalMatch.U1.getId() + " " + universalMatch.U2.getId());
 
-                if (event.getMember().getId().equals(universalMatch.U1.getId()) ||
-                        event.getMember().getId().equals(universalMatch.U2.getId())) {
+                if (isPlaying(event.getMember().getUser())) {
                     System.out.println("um user válido fez isso, legal");
                     System.out.println("==========================");
-                    updatePingPongMatch(event);
+
+                    int play = getPlaying(event);
+                    //será que seria melhor fazer ele retornar a partida em si?
+                    universalMatches.get(play).refute(event);
                 } else {
                     event.getChannel().sendMessage("cê não tá jogando bocó").queue();
                 }
@@ -537,7 +514,7 @@ public class aguaBot {
             } else if (contentRaw.equalsIgnoreCase("-vaza")) {
                 event.getChannel().sendMessage(":thumbsup: tá").queue();
                 event.getGuild().getAudioManager().closeAudioConnection();
-            } else if (rawSplit[0].equalsIgnoreCase("-toca")) {//todo split
+            } else if (rawSplit[0].equalsIgnoreCase("-toca")) {//to;do split //eu não sei oq eu quis dizer com o cmentário aanterior mas tá bom né
                 event.getChannel().sendMessage(":thumbsup: tocarei-de-eu").queue();
 
                 event.getGuild().getAudioManager().getSendingHandler();
@@ -576,9 +553,9 @@ public class aguaBot {
                 }
 
                 System.exit(0);
-            } else if (rawSplit[0].equalsIgnoreCase("-status")) {
-                //jda.getPresence().set
-                //todo cavalo
+            } else if (rawSplit[0].equalsIgnoreCase("-status") && isTrusted(event.getAuthor())) {
+                jda.getPresence().setPresence(Activity.streaming(rawSplit[1],rawSplit[2]),true);
+
             } else if (rawSplit[0].equalsIgnoreCase("-mega") && rawSplit.length >= 2 && message.getAttachments().size() == 0) { //método de texto
                 String args = "";
                 for (int g = 1; g < rawSplit.length; g++) {
@@ -587,7 +564,7 @@ public class aguaBot {
                 Notifiers.add(new notifier(event.getAuthor(), args));
                 event.getChannel().sendMessage("notifiquei o puto").queue();
 
-            } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) { //todo concertaisso
+            } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) {
                 try {
                     Notifiers.add(new notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl())));
                 } catch (IOException e) {
@@ -614,19 +591,33 @@ public class aguaBot {
                 }
 
             } else if (message.getAuthor().getId().equals(Mega2223ID)
-                    && event.getMessage().getMentionedMembers().size() > 1
-                    && rawSplit[0].equals("-webhook")
+                    && event.getMessage().getMentionedMembers().size() >= 1
+                    && rawSplit[0].equalsIgnoreCase("-webhook")
             ) {
                 List<Member> ment = event.getMessage().getMentionedMembers();
                 Member mentioned = ment.get(0);
-                WebhookManager webhook = (WebhookManager) event.getChannel().createWebhook(mentioned.getNickname()).complete();
-                //try {
-                //webhook.setAvatar(getUserAvatar(event.getAuthor())); todo termina isso
-                //} catch (IOException e) {
-                //e.printStackTrace();
-                //}
+
+                WebhookManager webhook = event.getChannel().createWebhook(mentioned.getNickname()).complete().getManager();
+                try {
+                    BufferedImage ee = (BufferedImage) getImageByURL(event.getAuthor().getAvatarUrl());
+                    byte[] bito = ((DataBufferByte)(ee.getRaster().getDataBuffer())).getData();
+                    //Icon icone = Icon.from(new Imageb);
+                    event.getChannel().sendFile(bito,rawSplit[2]).queue();
+                    //webhook.setAvatar(icone);
+                    //mano
+                    //mano
+                    //mano
+
+                } catch (IOException e) {
+                    e.printStackTrace(); }
+
             } else if (rawSplit[0].equalsIgnoreCase("-pingpong")
                     && 1 == event.getMessage().getMentionedMembers().size()) {
+
+                refreshFinishedMatches();
+
+                if(isPlaying(event.getAuthor())){event.getChannel().sendMessage("Cê já tá jogando bocó").queue();}
+
                 if (rawSplit.length >= 4) {
                     runPingPongMatch(event, Integer.parseInt(rawSplit[2]), Integer.parseInt(rawSplit[3]));
                 } else {
@@ -671,28 +662,6 @@ public class aguaBot {
                 File filo = new File(LOG_PATH);
                 event.getChannel().sendFile(filo, "log.txt").queue();
 
-            } else if (rawSplit[0].equalsIgnoreCase("-startPoll")) {
-                if (event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)) {
-                    event.getChannel().sendMessage(":thumbsup:").queue();
-                    Role cargo = event.getMessage().getMentionedRoles().get(0);
-                    List<ElectionPoll.Candidate> candidates;
-                    candidates = new ArrayList<ElectionPoll.Candidate>();
-                    for (int g = 0; g < event.getMessage().getMentionedMembers().size(); g++) {
-                        Member atual = event.getMessage().getMentionedMembers().get(g);
-                        candidates.add(new ElectionPoll.Candidate(event.getMember(), event.getMember().getEffectiveName()));
-                    }
-                    //fixme poll = new ElectionPoll(candidates, cargo);
-
-                }
-            } else if (rawSplit[0].equalsIgnoreCase("-endPoll")) {
-                ElectionPoll.Candidate winner;
-                        /*fixme List<ElectionPoll.Candidate> runPol = poll.runPoll();
-                        if(runPol.size() == 1){
-                            winner = runPol.get(0);
-                        } else
-                        {
-                            //poll = new ElectionPoll(new ArrayList<ElectionPoll.Candidate>());
-                        }*/
             } else if (rawSplit[0].equalsIgnoreCase("-addfunny")) {
                 String name = rawSplit[1];
                 //todo Image funny = (Image) message.getEmbeds().get(0).getImage();
@@ -719,8 +688,8 @@ public class aguaBot {
                 for (int g = 0; g < memberList.size(); g++) {
                     censoredUsers.remove(memberList.get(g).getUser());
                 }
-                //todo colocar em seu próprio void para uso futuro
-                //todo inicializa os censurados
+                //to;do colocar em seu próprio void para uso futuro
+                //acho que não precisa
                 String mand = "";
                 for(int f = 0; f < censoredUsers.size(); f++){
                     String at = censoredUsers.get(f).getId();
@@ -739,14 +708,19 @@ public class aguaBot {
                     event.getChannel().sendMessage(":thumbsdown: Só o <@!" + Mega2223ID + "> e usuários confiados podem fazer isso").queue();
                 }
 
-                List<VoiceChannel> channels = event.getGuild().getVoiceChannels(); //todo varias vezes
+                List<VoiceChannel> channels = event.getGuild().getVoiceChannels();
                 Member mentioned = event.getMessage().getMentionedMembers().get(0);
                 VoiceChannel finals = mentioned.getVoiceState().getChannel();
-                for (int g = 0; g < channels.size(); g++) {
-                    VoiceChannel atual = channels.get(g);
-                    event.getGuild().moveVoiceMember(mentioned, channels.get(g)).queue();
-                }
 
+                int quantas = 1;
+                if(rawSplit.length >=3){quantas = Integer.parseInt(rawSplit[2]);}
+
+                for(int f = 0; f < quantas; f++) {
+                    for (int g = 0; g < channels.size(); g++) {
+                        VoiceChannel atual = channels.get(g);
+                        event.getGuild().moveVoiceMember(mentioned, channels.get(g)).queue();
+                    }
+                }
                 event.getGuild().moveVoiceMember(mentioned, finals).queue();
             } else if (contentRaw.equalsIgnoreCase("-givePM") && isTrusted(event.getAuthor())) {
                 PrivateChannel privateChannel = jda.openPrivateChannelById(event.getAuthor().getId()).complete();
@@ -894,7 +868,7 @@ public class aguaBot {
     }
 
 
-    //fixme
+    //youtube fdp
     public static YouTube buildYoutube(final String youtubeKey) throws IllegalAccessException, InstantiationException {
 
         HttpTransport transport = new NetHttpTransport();
@@ -915,6 +889,70 @@ public class aguaBot {
         //YTbuilder.set
         YouTube yt = YTbuilder.build();
         return yt;
+    }
+
+    public static boolean isPlaying(User user){
+        boolean is = false;
+        String UID = user.getId();
+        for(int g = 0; g < universalMatches.size(); g++){
+            PingPongMatch atual = universalMatches.get(g);
+            if(UID.equalsIgnoreCase(atual.U1.getId())||UID.equalsIgnoreCase(atual.U2.getId())){
+                is = true;
+            }
+        }
+
+        return is;
+    }
+
+    public static void refreshFinishedMatches(){
+        for(int g = 0; g < universalMatches.size(); g++){
+            if (!universalMatches.get(g).rodando){universalMatches.remove(g);}
+        }
+    }
+
+    public static Image getImageByURL(String url) throws IOException {
+        return getImageByURL(new URL(url));
+    }
+
+    public static Image getImageByURL(URL url) throws IOException {
+        System.setProperty("http.agent", "Chrome");
+        //sério isso?
+        // isso é prova definitiva que HTTP é coisa do demônio
+        //mano eu to mt puto vai se fuder era so fingir que era a porra do Chrome
+        return ImageIO.read(url);
+    }
+
+    public static void initalizeLists(){
+        String trustedUsers[] = properties.getProperty("trusted").split(",");
+        String toCensorr[] = properties.getProperty("censored").split(",");
+        String bannedUsers[] = properties.getProperty("banned").split(",");
+
+        for (int us = 0; /*referencia among us*/ us < trustedUsers.length; us++) {
+            String trustedAct = trustedUsers[us];
+            if (trustedAct == null) {
+                break;
+            }
+            TRUSTED.add(trustedAct);
+            System.out.println("User confiado carregado: " + jda.getUserById(trustedAct).getName());
+        }
+
+        for (int us = 0; /*referencia among us*/ us < bannedUsers.length; us++) {
+            String bannedAct = bannedUsers[us];
+            if (bannedAct == null) {
+                break;
+            }
+            BOTBANNED.add(bannedAct);
+            System.out.println("User banido carregado: " + jda.getUserById(bannedAct).getName());
+        }
+
+        for (int us = 0; /*referencia among us*/ us < toCensorr.length; us++) {
+            String cenAct = toCensorr[us];
+            if (cenAct == null) {
+                break;
+            }
+            censoredUsers.add(jda.getUserById(cenAct));
+            System.out.println("User censurado carregado: " + jda.getUserById(cenAct).getName());
+        }
     }
 
 }

@@ -13,6 +13,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
 
+import static net.Mega2223.principal.aguaBot.getImageByURL;
+
 public class notifier extends JFrame {
     private JLabel label;
     private JLabel label2;
@@ -34,20 +36,8 @@ public class notifier extends JFrame {
 
         setLocation(r.nextInt(1360), r.nextInt(768));
 
-        //System.out.println("cabei232");
+        Image bImg = getImageByURL(url);
 
-        //label = new JLabel(user.getName() + ":");
-        //System.out.println(url.toString());
-
-        //Image img = ImageIO.read(url.openStream());
-
-        System.setProperty("http.agent", "Chrome"); //sério isso?
-                                                    //isso é prova definitiva que HTTP é coisa do demônio
-                                                    //mano eu to mt puto vai se fuder era so fingir que era a porra do Chrome
-        //System.out.println("cabei333");
-        //System.out.println("conectado");
-
-        Image bImg = ImageIO.read(url);
         //System.out.println(bImg.getHeight()+":"+bImg.getWidth());
 
         if (bImg == null) {
