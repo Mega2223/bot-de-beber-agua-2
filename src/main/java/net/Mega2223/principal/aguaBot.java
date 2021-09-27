@@ -49,9 +49,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.sql.Time;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.api.services.youtube.*;
 
@@ -117,7 +120,7 @@ public class aguaBot {
         BOTBANNED = new ArrayList<String>();
         censoredUsers = new ArrayList<User>();//eu sou mt consistente nas capslocks ne pqp
         Notifiers = new ArrayList<notifier>();
-
+        universalMatches = new ArrayList<PingPongMatch>();
 
         initalizeLists();
 
@@ -131,9 +134,15 @@ public class aguaBot {
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
 
+        fer = PlayerManager.getInstance();
+
+        log = log + "[BOT LIGADO EM: " + Time.from(Instant.now()) + "]\n";
+        writeInLog(log);
+
         System.out.println("tudopronto");
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
-        fer = PlayerManager.getInstance();
+
+
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
@@ -258,9 +267,18 @@ public class aguaBot {
         return retorno;
     }
 
+
+
     public static void writeInLog(String what) throws FileNotFoundException {
-        System.out.println("writeInLog chamado");
-        System.out.println(LOG_PATH);
+        /**
+         * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
+         * */
+
+        //fixme pq ele fica metendo essa
+        //System.out.println("writeInLog chamado");
+        log = log.replace("null\n","");
+
+        //System.out.println(log);
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File(LOG_PATH)));
 
         try {
@@ -414,6 +432,7 @@ public class aguaBot {
                 //System.out.println("RESPOSTA PING IDENTIFICADA");
                 //System.out.println(event.getAuthor().getId() + "?=" + universalMatch.U1.getId() + " " + universalMatch.U2.getId());
 
+                refreshFinishedMatches();
                 if (isPlaying(event.getMember().getUser())) {
                     System.out.println("um user válido fez isso, legal");
                     System.out.println("==========================");
@@ -434,14 +453,41 @@ public class aguaBot {
     public static class listenersDoLog extends ListenerAdapter {
 
 
+
         public void onGuildVoiceJoin(GuildVoiceJoinEvent ev) {
-            log = log + "[" + ev.getMember().getUser().getName() + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "[" + Time.from(Instant.now()) + " | "+  ev.getGuild().getName() + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         public void onGuildVoiceLeave(GuildVoiceLeaveEvent ev) {
-            log = log + "[" + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "[" + Time.from(Instant.now()) + " | "+ ev.getMember().getUser().getName() + "] -> " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
+        public void onGuildMessageReceived(GuildMessageReceivedEvent event){
+
+
+            if (!event.getMessage().getAuthor().isBot()) {
+                System.out.println("Pessoa: " + event.getAuthor().getName() + " Mensagem: " + event.getMessage().getContentRaw());
+                log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName()  + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + "]: " + event.getMessage().getContentRaw() + "\n";
+            }
+
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+        }
 
     }
 
@@ -465,12 +511,15 @@ public class aguaBot {
             final String contentRaw = message.getContentRaw();
             final String[] rawSplit = contentRaw.split(" ");
 
-            String firstC = message.getContentRaw().substring(0,1);
-            //System.out.println("FIRSTC>" + firstC);
-            boolean isCommand = firstC.contains("-");
-            boolean isBanned = isBotBanned(event.getAuthor());
+            boolean isCommand;
+            boolean isBanned;
 
-            //System.out.println("Comando chamado:" + event.getMessage().getContentRaw() + " de variáveis " + isCommand + isBanned);
+            isBanned = isBotBanned(event.getAuthor());
+            try{
+                String firstC = message.getContentRaw().substring(0,1);
+                isCommand = firstC.contains("-");
+
+            } catch (StringIndexOutOfBoundsException e){isCommand = false;}
 
             BOTBANNED.clear();
             BOTBANNED = new ArrayList<String>();
@@ -482,10 +531,6 @@ public class aguaBot {
                 return;
             }
 
-            if (!event.getMessage().getAuthor().isBot()) {
-                System.out.println("Pessoa: " + event.getAuthor().getName() + " Mensagem: " + contentRaw);
-                log = log + "[" + event.getGuild().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + "]: " + event.getMessage().getContentRaw() + "\n";
-            }
             if (censoredUsers.contains(event.getAuthor())) {
                 event.getMessage().delete().queue();
                 return;
@@ -515,7 +560,7 @@ public class aguaBot {
                 event.getChannel().sendMessage(":thumbsup: tá").queue();
                 event.getGuild().getAudioManager().closeAudioConnection();
             } else if (rawSplit[0].equalsIgnoreCase("-toca")) {//to;do split //eu não sei oq eu quis dizer com o cmentário aanterior mas tá bom né
-                event.getChannel().sendMessage(":thumbsup: tocarei-de-eu").queue();
+                event.getChannel().sendMessage(":thumbsup: Tocarei-de-eu").queue();
 
                 event.getGuild().getAudioManager().getSendingHandler();
 
@@ -583,7 +628,9 @@ public class aguaBot {
 
             } else if (isTrusted(event.getAuthor()) && rawSplit[0].equalsIgnoreCase("-cleanlogs")) {
                 try {
-                    writeInLog("");
+                    log = "";
+                    writeInLog(log);
+
                     event.getChannel().sendMessage("deletados").queue();
                 } catch (FileNotFoundException e) {
                     event.getChannel().sendMessage("não achei os arquivos, chama o <!@" + Mega2223ID + "> pra ver oq rolou").queue();
@@ -640,7 +687,7 @@ public class aguaBot {
 
                 for (int g = 0; g < messages.size(); g++) {
                     if (messages.get(g).getMember().getId().equals(mentionedMember.getId())) {
-                        System.out.println("deletede");
+                        //System.out.println("deletede");
                         messages.get(g).delete().complete();
 
                     }
@@ -861,6 +908,38 @@ public class aguaBot {
                 }
                 Notifiers.clear();
 
+            } else if (rawSplit[0].equalsIgnoreCase("-report") && isTrusted(event.getAuthor())){
+
+                String finalReport = "```[INFO]:\n\n";String[] e;
+
+                Object[] intsss = jda.getGatewayIntents().stream().toArray();
+
+                finalReport = finalReport + "GatewayIntents: ";
+                for(int f = 0; f < intsss.length;f++){
+                    GatewayIntent at = (GatewayIntent) intsss[f];
+                    if(f != intsss.length - 1){finalReport = finalReport + at.name() + ", ";} else
+                    {finalReport = finalReport + at.name() + ".";}
+                }
+                finalReport = finalReport + "\n\n";
+
+
+
+                finalReport = finalReport + "[SERVIDORES:]\n\n";
+                List<Guild> servers = jda.getGuilds();
+
+
+
+                for(int f = 0; f < servers.size();f++){
+                    Guild atual = servers.get(f);
+                    finalReport = finalReport + atual.getName() + ":\n";
+                    finalReport = finalReport + "Membros: " + atual.getMembers().size() + "\n";
+                    finalReport = finalReport + "Emotes: " + atual.getEmotes().size() + "\n";
+                    finalReport = finalReport + "Dono: " + atual.getOwner().getUser().getName() + "#" + atual.getOwner().getUser().getDiscriminator() + "\n\n";
+
+                }
+
+                System.out.println(finalReport);
+                event.getChannel().sendMessage(finalReport + "```").queue();
             }
 
         }
