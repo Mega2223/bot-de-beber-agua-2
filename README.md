@@ -33,11 +33,19 @@ Continuação do meu primeiro bot-de-beber-agua com mais coisas.
 
 -pingpong [usuário] [intervalo entre mínimo e máximo] [número máximo de segundos entre jogadas]
 
+-pegaarquivo [nome]
+
+-mandaarquivo [nome] [conteúdo]
+
+-escrevenoarquivo [nome] [conteúdo]
+
+-listaosarquivos
+
+-saysplit [nome] [sintaxe]
+
 -enablelisteners (só pra quem tem user confiado)
 
 -disablelisteners (só pra quem tem user confiado)
-
--shutdown (só eu posso usar)
 
 -givelogs (só pra quem tem user confiado)
 
@@ -61,11 +69,25 @@ Continuação do meu primeiro bot-de-beber-agua com mais coisas.
 
 -removeproperty[argumento] (só pra quem tem user confiado)
 
+-setproperty[argumento] (só pra quem tem user confiado)
+
 -getproperties (só pra quem tem user confiado)
+
+-report (só pra quem tem user confiado)
+
+-giveservers (só pra quem tem user confiado)
+
+-shutdown (só eu posso usar)
+
+-cleannotifiers (só eu posso usar)
+
+-webhook (só eu posso usar)
 
 ## Problemas conhecidos:
 
-~o bot não consegue fazer duas partidas de pingpong ao mesmo tempo 
+~is comandos tão com uma sintaxe maluca
+
+~else if
 
 ~documentação tá horrível
 
