@@ -17,6 +17,7 @@ import lavaplayer.PlayerManager;
 import net.Mega2223.utils.ElectionPoll;
 import net.Mega2223.utils.PingPongMatch;
 
+import net.Mega2223.utils.TextFileModifier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -62,8 +63,10 @@ import com.google.api.services.youtube.*;
 public class aguaBot {
 
 
-    public static final String LOG_PATH = System.getProperty("user.dir") + "\\log.txt";
-    public static final String PROPERTIES_PATH = System.getProperty("user.dir") + "\\configs.properties";
+    public static final String projectPath = System.getProperty("user.dir");
+    protected static final String fileCreatorPath = projectPath + "\\src\\main\\java\\net\\Mega2223\\arquivosConfidenciais";
+    public static final String LOG_PATH = projectPath + "\\log.txt";
+    public static final String PROPERTIES_PATH = projectPath + "\\configs.properties";
     public static final String Mega2223ID = "301424656051732491";
     public static YouTube youtube; //wtf
     public static List<String> BOTBANNED;
@@ -81,7 +84,6 @@ public class aguaBot {
     public static String YoutubeKey;
     public static Builder YTbuilder;
     public static List<notifier> Notifiers;
-    @Deprecated
     public static List <PingPongMatch> universalMatches;
 
     public static List<User> censoredUsers;
@@ -188,8 +190,8 @@ public class aguaBot {
 
     public static boolean addToCensoredFile(User userrr) throws IOException {
         FileOutputStream inputStreamm;
-        File logFile = new File(System.getProperty("user.dir") + "\\banList.txt");
-        System.out.println("Adicionando um user para a lista em: " + System.getProperty("user.dir") + "\\banList.txt");
+        File logFile = new File(projectPath + "\\banList.txt");
+        System.out.println("Adicionando um user para a lista em: " + projectPath + "\\banList.txt");
         try {
             inputStreamm = new FileOutputStream(logFile);
         } catch (FileNotFoundException e) {
@@ -530,7 +532,7 @@ public class aguaBot {
                 event.getChannel().sendMessage("Você não pode usar comandos do bot " + user.getName() + " :(").queue();
                 return;
             }
-
+            //fixme meu deus eu to virando o YandereDev
             if (censoredUsers.contains(event.getAuthor())) {
                 event.getMessage().delete().queue();
                 return;
@@ -940,6 +942,36 @@ public class aguaBot {
 
                 System.out.println(finalReport);
                 event.getChannel().sendMessage(finalReport + "```").queue();
+            } else if(rawSplit[0].equalsIgnoreCase("-pegaarquivo")){
+                try {
+                    String manda = TextFileModifier.readFile(fileCreatorPath + "\\" + rawSplit[1]);
+                    event.getChannel().sendMessage(manda.replace("null\n" , "")).queue();
+                } catch (IOException e) {
+                    event.getChannel().sendMessage("não deu mano, IOException :(").queue();
+                    e.printStackTrace();
+                }
+            }
+
+            else if(rawSplit[0].equalsIgnoreCase("-mandaarquivo")||rawSplit[0].equalsIgnoreCase("-escrevenoarquivo")){
+                try{
+                    String path = rawSplit[1];
+                    String writeWhat = "";
+                    for(int g = 2; g < rawSplit.length; g++){
+                        writeWhat = writeWhat + rawSplit[g];
+                    }
+                    System.out.println(fileCreatorPath +"\\" + path);
+                    TextFileModifier.writeInFile(writeWhat, fileCreatorPath +"\\" + path);
+                    event.getChannel().sendMessage(":thumbsup beleza mano").queue();
+                } catch (ArrayIndexOutOfBoundsException | IOException ex){event.getChannel().sendMessage(ex.getMessage()).queue();ex.printStackTrace();}
+            }
+            else if(rawSplit[0].equalsIgnoreCase("-listaosarquivos")){
+                List<File> files = TextFileModifier.listFilesForFolder(fileCreatorPath);
+                String resposta = "";
+                for(int f = 0; f < files.size(); f++){
+                    File at = files.get(f);
+                    resposta = resposta + at.getName() + "\n";
+                }
+                event.getChannel().sendMessage(resposta).queue();
             }
 
         }
