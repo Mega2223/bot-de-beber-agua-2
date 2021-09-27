@@ -24,7 +24,6 @@ public class notifier extends JFrame {
         //System.out.println("cabeid");
 
 
-        ;
         //setSize(180, 80);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
@@ -47,7 +46,7 @@ public class notifier extends JFrame {
         //System.out.println("imgIcon: "+imgIcon.getIconHeight() + ":" + imgIcon.getIconWidth());
         //System.out.println("Icon: "+((Icon)imgIcon).getIconHeight() + ":" + ((Icon)imgIcon).getIconWidth());
 
-        label2 = new JLabel((Icon)imgIcon);
+        label2 = new JLabel(imgIcon);
         label2.setIcon(imgIcon);
         //add(label);
         add(label2);
@@ -79,7 +78,7 @@ public class notifier extends JFrame {
         setLocation(r.nextInt(1360), r.nextInt(768));//to.do usa as resoluções preguiçoso
 
         String messag = user.getName() + ":\n" + message;
-        String spt[] = messag.split("\n");
+        String[] spt = messag.split("\n");
         int maxc = 0;
         for(int g = 0; g < spt.length; g++){
              // bad code lol
