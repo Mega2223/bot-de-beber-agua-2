@@ -942,7 +942,7 @@ public class aguaBot {
 
                 System.out.println(finalReport);
                 event.getChannel().sendMessage(finalReport + "```").queue();
-            } else if(rawSplit[0].equalsIgnoreCase("-pegaarquivo")){
+            } else if(rawSplit[0].equalsIgnoreCase("-pegaarquivo")){//todo mandar arquivos
                 try {
                     String manda = TextFileModifier.readFile(fileCreatorPath + "\\" + rawSplit[1]);
                     event.getChannel().sendMessage(manda.replace("null\n" , "")).queue();
@@ -957,11 +957,11 @@ public class aguaBot {
                     String path = rawSplit[1];
                     String writeWhat = "";
                     for(int g = 2; g < rawSplit.length; g++){
-                        writeWhat = writeWhat + rawSplit[g];
+                        writeWhat = writeWhat + rawSplit[g] + " ";
                     }
                     System.out.println(fileCreatorPath +"\\" + path);
                     TextFileModifier.writeInFile(writeWhat, fileCreatorPath +"\\" + path);
-                    event.getChannel().sendMessage(":thumbsup beleza mano").queue();
+                    event.getChannel().sendMessage(":thumbsup: beleza mano").queue();
                 } catch (ArrayIndexOutOfBoundsException | IOException ex){event.getChannel().sendMessage(ex.getMessage()).queue();ex.printStackTrace();}
             }
             else if(rawSplit[0].equalsIgnoreCase("-listaosarquivos")){
@@ -972,6 +972,17 @@ public class aguaBot {
                     resposta = resposta + at.getName() + "\n";
                 }
                 event.getChannel().sendMessage(resposta).queue();
+            } else if (rawSplit[0].equalsIgnoreCase("-saysplit")){
+                try {
+                    String manda[] = TextFileModifier.readFile(fileCreatorPath + "\\" + rawSplit[1]).split(rawSplit[2]);
+
+                    for(int u = 0; u < manda.length-1; u++){
+                        event.getChannel().sendMessage(manda[u]).queue();
+                    }
+
+                } catch (IOException | ArrayIndexOutOfBoundsException exception) {
+                    event.getChannel().sendMessage("sintaxe errada trouxa").queue();
+                }
             }
 
         }
