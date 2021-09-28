@@ -13,6 +13,7 @@ import com.sun.javaws.exceptions.InvalidArgumentException;
 import lavaplayer.PlayerManager;
 import net.Mega2223.utils.PingPongMatch;
 import net.Mega2223.utils.TextFileModifier;
+import net.Mega2223.utils.Janela;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -52,6 +53,7 @@ public class aguaBot {
     public static final String PROPERTIES_PATH = projectPath + "\\configs.properties";
     public static final String Mega2223ID = "301424656051732491";
     protected static final String fileCreatorPath = projectPath + "\\src\\main\\java\\net\\Mega2223\\arquivosConfidenciais";
+    protected static String TCBotID;
     public static YouTube youtube; //wtf
     public static List<String> BOTBANNED;
     public static List<String> TRUSTED;
@@ -69,6 +71,7 @@ public class aguaBot {
     public static Builder YTbuilder;
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
+    public static Janela currentJanela;
 
     public static List<User> censoredUsers;
 
@@ -98,7 +101,7 @@ public class aguaBot {
 
         saveProperties(properties);
 
-        jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+        jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
         jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
         Imperio = jda.getGuildById("606274842722959384");
@@ -107,6 +110,7 @@ public class aguaBot {
         censoredUsers = new ArrayList<User>();//eu sou mt consistente nas capslocks ne pqp
         Notifiers = new ArrayList<notifier>();
         universalMatches = new ArrayList<PingPongMatch>();
+        TCBotID = properties.getProperty("botchannel");
 
         initalizeLists();
 
@@ -114,7 +118,7 @@ public class aguaBot {
         Imperio.getMemberCache();
 
         List<TextChannel> textChannels = Imperio.getTextChannels();
-        canalDoBot = jda.getTextChannelById("886685128762482800");
+        canalDoBot = jda.getTextChannelById(TCBotID);
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerParalelo());
@@ -170,7 +174,7 @@ public class aguaBot {
         return isTrusted(user.getUser());
     }
 
-
+    @Deprecated
     public static boolean addToCensoredFile(User userrr) throws IOException {
         FileOutputStream inputStreamm;
         File logFile = new File(projectPath + "\\banList.txt");
@@ -226,7 +230,7 @@ public class aguaBot {
         return isPl;
     }
 
-    public static void fazerUmaCurvaLegal(int numberOfSpaces, TextChannel canalDoBot) {
+    public static void fazerUmaCurvaLegal(int numberOfSpaces, TextChannel canalPraMandar) {
         String nextLane = "";
         for (double g = 0; g < 20; g = g + 0.1) {
             double f = Math.cos(g) * 2;
@@ -238,7 +242,7 @@ public class aguaBot {
 
             nextLane = nextLane + "0";
             System.out.println(nextLane);
-            canalDoBot.sendMessage(nextLane).queue();
+            canalPraMandar.sendMessage(nextLane).queue();
             nextLane = "";
         }
     }
@@ -263,8 +267,6 @@ public class aguaBot {
          * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
          * */
 
-        //fixme pq ele fica metendo essa
-        //System.out.println("writeInLog chamado");
         log = log.replace("null\n", "");
 
         //System.out.println(log);
@@ -448,16 +450,20 @@ public class aguaBot {
             }
             String legal = "User " + event.getUser().getName() + " atualizou seu status para " + event.getNewValue().name() + "";
             canalDoBot.sendMessage(legal).queue();
-            System.out.println(legal);
+            //System.out.println(legal);
         }
 
         public void onUserUpdateActivities(UserUpdateActivitiesEvent event) {
             if (!event.getGuild().getId().equals(Imperio.getId())) {
                 return;
             }
-            String legal = "User " + event.getUser().getName() + " atualizou sua atividade para " + event.getNewValue().get(0) + "";
-            canalDoBot.sendMessage(legal).queue();
-            System.out.println(legal);
+            try {
+                String legal = "User " + event.getUser().getName() + " atualizou sua atividade para " + event.getNewValue().get(0) + "";
+                canalDoBot.sendMessage(legal).queue();
+                //System.out.println(legal);
+
+            } catch (IndexOutOfBoundsException ex){}
+
         }
     }
 
@@ -795,10 +801,7 @@ public class aguaBot {
                 File filo = new File(LOG_PATH);
                 event.getChannel().sendFile(filo, "log.txt").queue();
 
-            } else if (rawSplit[0].equalsIgnoreCase("-addfunny")) {
-                String name = rawSplit[1];
-                //todo Image funny = (Image) message.getEmbeds().get(0).getImage();
-            } else if (rawSplit[0].equalsIgnoreCase("-getfunny")) {/*todo funnies*/}//será q vale a pena fazer os funnies?
+            }  //será q vale a pena fazer os funnies?
             else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-1984")) {
                 List<Member> memberList = message.getMentionedMembers();
                 for (int g = 0; g < memberList.size(); g++) {
@@ -808,11 +811,9 @@ public class aguaBot {
                         event.getGuild().kickVoiceMember(memberList.get(g)).queue();
                     }
                 }
-                try {
-                    addToCensoredFile(user);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                refreshCensored();
+
                 event.getChannel().sendMessage("Ok ministro da verdade :thumbsup:").queue();
 
 
@@ -1030,7 +1031,7 @@ public class aguaBot {
 
                 System.out.println(finalReport);
                 event.getChannel().sendMessage(finalReport + "```").queue();
-            } else if (rawSplit[0].equalsIgnoreCase("-pegaarquivo")) {//todo mandar arquivos
+            } else if (rawSplit[0].equalsIgnoreCase("-pegaarquivo")) {
                 try {
                     String manda = TextFileModifier.readFile(fileCreatorPath + "\\" + rawSplit[1]);
                     event.getChannel().sendMessage(manda.replace("null\n", "")).queue();
@@ -1074,8 +1075,24 @@ public class aguaBot {
                 } catch (IOException | ArrayIndexOutOfBoundsException exception) {
                     event.getChannel().sendMessage("sintaxe errada trouxa").queue();
                 }
+            } else if (rawSplit[0].equalsIgnoreCase("-windowlog")&&event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)){
+                try {
+                    currentJanela = new Janela();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
             }
 
+        }
+
+        private void refreshCensored() {
+            StringBuilder toCensor = new StringBuilder();
+            for(int f = 0; f < censoredUsers.size(); f++){
+                toCensor.append(censoredUsers.get(f).getId());
+            }
+            properties.setProperty("censored", toCensor.toString());
         }
 
     }

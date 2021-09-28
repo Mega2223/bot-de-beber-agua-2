@@ -99,7 +99,7 @@ public class notifier extends JFrame {
 
 
 
-    private static String ConvertToHTML(String[] eee) {
+    public static String ConvertToHTML(String[] eee) {
         String end = "";
         for (int cocó = 0; cocó < eee.length; cocó++) {
             //pra deixar claro eu copiei isso de um projeto antigo
