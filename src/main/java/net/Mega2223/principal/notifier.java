@@ -89,17 +89,17 @@ public class notifier extends JFrame {
 
     public static String ConvertToHTML(String[] eee) {
         String end = "";
-        for (int cocó = 0; cocó < eee.length; cocó++) {
+        for (int ever = 0; ever < eee.length; ever++) {
             //pra deixar claro eu copiei isso de um projeto antigo
 
-            if (cocó == 0) {
-                end = "<html>" + eee[cocó];
-            } else if (cocó == 1){
-                end = end + "<br/>" + eee[cocó].replace("-mega","");
+            if (ever == 0) {
+                end = "<html>" + eee[ever];
+            } else if (ever == 1){
+                end = end + "<br/>" + eee[ever].replace("-mega","");
             }
 
             else {
-                end = end + "<br/>" + eee[cocó];
+                end = end + "<br/>" + eee[ever];
             }
 
         }
