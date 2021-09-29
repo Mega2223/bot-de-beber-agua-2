@@ -1,9 +1,6 @@
 package net.Mega2223.utils;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +39,12 @@ public class TextFileModifier {
         File filo = new File(path);
         OutputStreamWriter writer;
 
-        if(filo.exists()){writer = new OutputStreamWriter(new FileOutputStream(filo));}
-        else {filo.createNewFile();writer = new OutputStreamWriter(new FileOutputStream(filo));}
+        if (filo.exists()) {
+            writer = new OutputStreamWriter(new FileOutputStream(filo));
+        } else {
+            filo.createNewFile();
+            writer = new OutputStreamWriter(new FileOutputStream(filo));
+        }
 
         writer.write(what);
         writer.close();

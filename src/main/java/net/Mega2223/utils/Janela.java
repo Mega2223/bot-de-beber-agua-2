@@ -14,10 +14,10 @@ import static net.Mega2223.principal.aguaBot.jda;
 
 public class Janela extends JFrame {
     private static JLabel label1;
-    private BotThread botThread;
-    private JScrollBar jScrollBar;
     private static JScrollPane container;
     private static JPanel panel;
+    private BotThread botThread;
+    private JScrollBar jScrollBar;
 
     public Janela() throws IOException {
 
@@ -58,8 +58,6 @@ public class Janela extends JFrame {
         add(container);
 
 
-
-
         ScheduledThreadPoolExecutor executor;
         executor = new ScheduledThreadPoolExecutor(1);
         botThread = new BotThread();
@@ -70,7 +68,6 @@ public class Janela extends JFrame {
 
 
     }
-
 
 
     protected class BotThread extends Thread {

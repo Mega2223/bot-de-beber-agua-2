@@ -12,9 +12,10 @@ import java.util.Random;
 import static net.Mega2223.principal.aguaBot.getImageByURL;
 
 public class notifier extends JFrame {
+    int x;
+    int y;
     private JLabel label;
     private JLabel label2;
-
     public notifier(final User user, final URL url) throws IOException {
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -43,13 +44,11 @@ public class notifier extends JFrame {
         setTitle(user.getName() + ":");
         ImageIcon iC = new ImageIcon(bImg);
 
-        setSize(iC.getIconWidth(),iC.getIconHeight() + 20); //todo pega a medida da barra
+        setSize(iC.getIconWidth(), iC.getIconHeight() + 20); //todo pega a medida da barra
         setVisible(true);
         //System.out.println("cabei");
     }
 
-    int x;
-    int y;
     public notifier(final User user, String message) {
         setVisible(true);
 
@@ -76,7 +75,7 @@ public class notifier extends JFrame {
         //System.out.println("tamanho: " +  x +" : " + y);
         x = maxc * 10 + 20;
         y = spt.length * 17 + 60;
-        setSize(x+1, y+1);
+        setSize(x + 1, y + 1);
 
         messag = ConvertToHTML(spt);
         label = new JLabel(messag);
@@ -86,7 +85,6 @@ public class notifier extends JFrame {
     }
 
 
-
     public static String ConvertToHTML(String[] eee) {
         String end = "";
         for (int ever = 0; ever < eee.length; ever++) {
@@ -94,11 +92,9 @@ public class notifier extends JFrame {
 
             if (ever == 0) {
                 end = "<html>" + eee[ever];
-            } else if (ever == 1){
-                end = end + "<br/>" + eee[ever].replace("-mega","");
-            }
-
-            else {
+            } else if (ever == 1) {
+                end = end + "<br/>" + eee[ever].replace("-mega", "");
+            } else {
                 end = end + "<br/>" + eee[ever];
             }
 

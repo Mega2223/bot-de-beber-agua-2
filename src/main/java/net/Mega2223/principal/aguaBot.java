@@ -11,14 +11,14 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTube.Builder;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import lavaplayer.PlayerManager;
-import lavaplayer.GuildMusicManager;
+import net.Mega2223.utils.Janela;
 import net.Mega2223.utils.PingPongMatch;
 import net.Mega2223.utils.TextFileModifier;
-import net.Mega2223.utils.Janela;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -45,7 +45,10 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 
+
 @SuppressWarnings("ALL")
+
+@Deprecated
 public class aguaBot {
 
 
@@ -54,8 +57,6 @@ public class aguaBot {
     public static final String PROPERTIES_PATH = projectPath + "\\configs.properties";
     public static final String Mega2223ID = "301424656051732491";
     protected static final String fileCreatorPath = projectPath + "\\src\\main\\java\\net\\Mega2223\\arquivosConfidenciais";
-    protected static String TCBotID;
-    public static YouTube youtube; //wtf
     public static List<String> BOTBANNED;
     public static List<String> TRUSTED;
     public static JDABuilder builder;
@@ -73,10 +74,11 @@ public class aguaBot {
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
-
     public static List<User> censoredUsers;
+    protected static String TCBotID;
 
-    public static void main(String[] args) throws LoginException, IOException, InstantiationException, IllegalAccessException {
+
+    public static void main(String[] args) throws LoginException, IOException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
         String key = inputStream.readLine();
         JDAKey = key.split(" ")[0];
@@ -103,14 +105,14 @@ public class aguaBot {
         saveProperties(properties);
 
         jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
-        jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        //jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
         Imperio = jda.getGuildById("606274842722959384");
-        TRUSTED = new ArrayList<String>();
-        BOTBANNED = new ArrayList<String>();
-        censoredUsers = new ArrayList<User>();//eu sou mt consistente nas capslocks ne pqp
-        Notifiers = new ArrayList<notifier>();
-        universalMatches = new ArrayList<PingPongMatch>();
+        TRUSTED = new ArrayList<>();
+        BOTBANNED = new ArrayList<>();
+        censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
+        Notifiers = new ArrayList<>();
+        universalMatches = new ArrayList<>();
         TCBotID = properties.getProperty("botchannel");
 
         initalizeLists();
@@ -118,7 +120,6 @@ public class aguaBot {
         Imperio.loadMembers();
         Imperio.getMemberCache();
 
-        List<TextChannel> textChannels = Imperio.getTextChannels();
         canalDoBot = jda.getTextChannelById(TCBotID);
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
@@ -143,14 +144,9 @@ public class aguaBot {
         mensagemfoda.delete().queue();
     }
 
-    public static boolean isBotBanned(Member user) {
-        return isBotBanned(user.getUser());
-    }
-
     public static boolean isBotBanned(User user) {
         boolean is = false;
-        for (int f = 0; f < BOTBANNED.size(); f++) {
-            String s = BOTBANNED.get(f);
+        for (String s : BOTBANNED) {
             //System.out.print(user.getId() + " comparando com" + s);
             if (user.getId().equalsIgnoreCase(s)) {
                 is = true;
@@ -268,9 +264,10 @@ public class aguaBot {
          * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
          * */
 
+        //System.out.println("Pegando o log em " +LOG_PATH);
         log = log.replace("null\n", "");
 
-        //System.out.println(log);
+
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File(LOG_PATH)));
 
         try {
@@ -380,8 +377,7 @@ public class aguaBot {
     public static boolean isPlaying(User user) {
         boolean is = false;
         String UID = user.getId();
-        for (int g = 0; g < universalMatches.size(); g++) {
-            PingPongMatch atual = universalMatches.get(g);
+        for (PingPongMatch atual : universalMatches) {
             if (UID.equalsIgnoreCase(atual.U1.getId()) || UID.equalsIgnoreCase(atual.U2.getId())) {
                 is = true;
             }
@@ -415,8 +411,8 @@ public class aguaBot {
         String toCensorr[] = properties.getProperty("censored").split(",");
         String bannedUsers[] = properties.getProperty("banned").split(",");
 
-        for (int us = 0; /*referencia among us*/ us < trustedUsers.length; us++) {
-            String trustedAct = trustedUsers[us];
+        /*referencia among us*/
+        for (String trustedAct : trustedUsers) {
             if (trustedAct == null) {
                 break;
             }
@@ -424,8 +420,8 @@ public class aguaBot {
             System.out.println("User confiado carregado: " + jda.getUserById(trustedAct).getName());
         }
 
-        for (int us = 0; /*referencia among us*/ us < bannedUsers.length; us++) {
-            String bannedAct = bannedUsers[us];
+        /*referencia among us*/
+        for (String bannedAct : bannedUsers) {
             if (bannedAct == null) {
                 break;
             }
@@ -433,8 +429,8 @@ public class aguaBot {
             System.out.println("User banido carregado: " + jda.getUserById(bannedAct).getName());
         }
 
-        for (int us = 0; /*referencia among us*/ us < toCensorr.length; us++) {
-            String cenAct = toCensorr[us];
+        /*referencia among us*/
+        for (String cenAct : toCensorr) {
             if (cenAct == null) {
                 break;
             }
@@ -463,7 +459,8 @@ public class aguaBot {
                 canalDoBot.sendMessage(legal).queue();
                 //System.out.println(legal);
 
-            } catch (IndexOutOfBoundsException ex){}
+            } catch (IndexOutOfBoundsException ex) {
+            }
 
         }
     }
@@ -539,7 +536,7 @@ public class aguaBot {
 
 
         public void onGuildVoiceJoin(GuildVoiceJoinEvent ev) {
-            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName()   + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "["  + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelJoined().getName() +"\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -548,7 +545,7 @@ public class aguaBot {
         }
 
         public void onGuildVoiceLeave(GuildVoiceLeaveEvent ev) {
-            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "["  + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() +"\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -560,7 +557,7 @@ public class aguaBot {
 
 
             if (!event.getMessage().getAuthor().isBot()) {
-                System.out.println("Pessoa: " + event.getAuthor().getName() + " Mensagem: " + event.getMessage().getContentRaw());
+                System.out.println("Pessoa: [" + event.getAuthor().getName() +"]Guild: [" + event.getGuild().getName() +"] Mensagem: " + event.getMessage().getContentRaw());
                 log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + "]: " + event.getMessage().getContentRaw() + "\n";
             }
 
@@ -573,9 +570,23 @@ public class aguaBot {
 
         }
 
+        public void onDisconnect(DisconnectEvent event) {
+
+            log = log + "[AVISO: DESCONECTADO EM: " + Date.from(Instant.now()) + " | " +  event.getCloseCode() + "]";
+
+
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public static class seraQueEuLembroComoUsaEventListeners extends ListenerAdapter { //lembro?
+
+
 
         public void onGuildVoiceJoin(final GuildVoiceJoinEvent event) {
             GuildVoiceState state = event.getVoiceState();
@@ -608,10 +619,10 @@ public class aguaBot {
             }
 
             BOTBANNED.clear();
-            BOTBANNED = new ArrayList<String>();
+            BOTBANNED = new ArrayList<>();
             String banRef[] = properties.getProperty("banned").split(",");
-            for (int f = 0; f < banRef.length; f++) {
-                BOTBANNED.add(banRef[f]);
+            for (String s : banRef) {
+                BOTBANNED.add(s);
             }
 
             if (isCommand && isBanned) {
@@ -778,10 +789,10 @@ public class aguaBot {
                 List<Message> messages = history.retrievePast(Integer.parseInt(rawSplit[2])).complete();
                 Member mentionedMember = event.getMessage().getMentionedMembers().get(0);
 
-                for (int g = 0; g < messages.size(); g++) {
-                    if (messages.get(g).getMember().getId().equals(mentionedMember.getId())) {
+                for (Message value : messages) {
+                    if (value.getMember().getId().equals(mentionedMember.getId())) {
                         //System.out.println("deletede");
-                        messages.get(g).delete().complete();
+                        value.delete().complete();
 
                     }
                 }
@@ -805,11 +816,11 @@ public class aguaBot {
             }  //será q vale a pena fazer os funnies?
             else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-1984")) {
                 List<Member> memberList = message.getMentionedMembers();
-                for (int g = 0; g < memberList.size(); g++) {
-                    censoredUsers.add(memberList.get(g).getUser());
-                    GuildVoiceState voice = memberList.get(g).getVoiceState();
+                for (Member value : memberList) {
+                    censoredUsers.add(value.getUser());
+                    GuildVoiceState voice = value.getVoiceState();
                     if (voice.inVoiceChannel()) {
-                        event.getGuild().kickVoiceMember(memberList.get(g)).queue();
+                        event.getGuild().kickVoiceMember(value).queue();
                     }
                 }
 
@@ -820,14 +831,14 @@ public class aguaBot {
 
             } else if (isTrusted(user) && rawSplit[0].equalsIgnoreCase("-2020")) {
                 List<Member> memberList = message.getMentionedMembers();
-                for (int g = 0; g < memberList.size(); g++) {
-                    censoredUsers.remove(memberList.get(g).getUser());
+                for (Member value : memberList) {
+                    censoredUsers.remove(value.getUser());
                 }
                 //to;do colocar em seu próprio void para uso futuro
                 //acho que não precisa
                 String mand = "";
-                for (int f = 0; f < censoredUsers.size(); f++) {
-                    String at = censoredUsers.get(f).getId();
+                for (User censoredUser : censoredUsers) {
+                    String at = censoredUser.getId();
                     mand = mand + at + ",";
                 }
                 properties.setProperty("censored", mand);
@@ -853,9 +864,8 @@ public class aguaBot {
                 }
 
                 for (int f = 0; f < quantas; f++) {
-                    for (int g = 0; g < channels.size(); g++) {
-                        VoiceChannel atual = channels.get(g);
-                        event.getGuild().moveVoiceMember(mentioned, channels.get(g)).queue();
+                    for (VoiceChannel atual : channels) {
+                        event.getGuild().moveVoiceMember(mentioned, atual).queue();
                     }
                 }
                 event.getGuild().moveVoiceMember(mentioned, finals).queue();
@@ -870,8 +880,8 @@ public class aguaBot {
 
                 //ok já que eu não posso ter uma lista de usuários com privatechannel de mão dada eu vou fazer do pior jeito possivel
 
-                List<Member> members = new ArrayList<Member>();
-                List<Member> channelados = new ArrayList<Member>();
+                List<Member> members = new ArrayList<>();
+                List<Member> channelados = new ArrayList<>();
                 jda.getUserById(Mega2223ID).openPrivateChannel().complete().getHistory().retrievePast(10).complete().size();
 
                 for (int f = 0; f < jda.getGuilds().size(); f++) {
@@ -911,8 +921,7 @@ public class aguaBot {
                     System.out.println(g + ": tenho um canal com " + channelados.get(g).getUser());
                     User atualizado = channelados.get(g).getUser();
                     List<Message> chat = atualizado.openPrivateChannel().complete().getHistory().retrievePast(100).complete();
-                    for (int v = 0; v < chat.size(); v++) {
-                        Message atualllllll = chat.get(v);
+                    for (Message atualllllll : chat) {
                         if (atualllllll.getAuthor().isBot()) {
                             System.out.println("bot em " + atualizado.getName());
                             continue;
@@ -926,8 +935,7 @@ public class aguaBot {
                     return;
                 }
 
-                for (int o = 0; o < channels.size(); o++) {
-                    PrivateChannel atual = channels.get(o);
+                for (PrivateChannel atual : channels) {
                     deb = deb + "*" + atual.getUser() + ":*" + "\n";
                     List<Message> reTrievePast = atual.getHistory().retrievePast(100).complete();
                     System.out.println("AtChannelSize:" + reTrievePast.size());
@@ -992,8 +1000,8 @@ public class aguaBot {
                 System.out.print(out);
                 event.getChannel().sendMessage(out).queue();
             } else if (rawSplit[0].equalsIgnoreCase("-cleannotifiers") && event.getAuthor().getId().equals(Mega2223ID)) {
-                for (int f = 0; f < Notifiers.size(); f++) {
-                    Notifiers.get(f).dispose();
+                for (net.Mega2223.principal.notifier notifier : Notifiers) {
+                    notifier.dispose();
 
                 }
                 Notifiers.clear();
@@ -1021,8 +1029,7 @@ public class aguaBot {
                 List<Guild> servers = jda.getGuilds();
 
 
-                for (int f = 0; f < servers.size(); f++) {
-                    Guild atual = servers.get(f);
+                for (Guild atual : servers) {
                     finalReport = finalReport + atual.getName() + ":\n";
                     finalReport = finalReport + "Membros: " + atual.getMembers().size() + "\n";
                     finalReport = finalReport + "Emotes: " + atual.getEmotes().size() + "\n";
@@ -1057,8 +1064,7 @@ public class aguaBot {
             } else if (rawSplit[0].equalsIgnoreCase("-listaosarquivos")) {
                 List<File> files = TextFileModifier.listFilesForFolder(fileCreatorPath);
                 String resposta = "";
-                for (int f = 0; f < files.size(); f++) {
-                    File at = files.get(f);
+                for (File at : files) {
                     resposta = resposta + at.getName() + "\n";
                 }
                 event.getChannel().sendMessage(resposta).queue();
@@ -1076,7 +1082,7 @@ public class aguaBot {
                 } catch (IOException | ArrayIndexOutOfBoundsException exception) {
                     event.getChannel().sendMessage("sintaxe errada trouxa").queue();
                 }
-            } else if (rawSplit[0].equalsIgnoreCase("-windowlog")&&event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)){
+            } else if (rawSplit[0].equalsIgnoreCase("-windowlog") && event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)) {
                 try {
                     currentJanela = new Janela();
                 } catch (IOException e) {
@@ -1084,14 +1090,16 @@ public class aguaBot {
                 }
 
 
+            } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())){
+                    System.out.println(log);
             }
 
         }
 
         private void refreshCensored() {
             StringBuilder toCensor = new StringBuilder();
-            for(int f = 0; f < censoredUsers.size(); f++){
-                toCensor.append(censoredUsers.get(f).getId());
+            for (User censoredUser : censoredUsers) {
+                toCensor.append(censoredUser.getId());
             }
             properties.setProperty("censored", toCensor.toString());
         }
