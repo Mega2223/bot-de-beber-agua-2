@@ -122,6 +122,9 @@ Tira todos os popups gerados pelo -mega.
 #### -webhook (só eu posso usar)
 Cria um webhook, atualmente é meio quebrado.
 
+#### -pritlog (só eu posso usar)
+Printa os logs no console
+
 ## Problemas conhecidos:
 
 ~is comandos tão com uma sintaxe maluca
