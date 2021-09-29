@@ -127,10 +127,10 @@ Printa os logs no console
 
 ## Problemas conhecidos:
 
-~is comandos tão com uma sintaxe maluca
+#### ~is comandos tão com uma sintaxe maluca
 
-~else if pra caramba
+#### ~else if pra caramba
 
-~documentação tá horrível
+#### ~documentação tá horrível
 
-~2020 era pra ser 2021 tecnicamente
+#### ~2020 era pra ser 2021 tecnicamente
