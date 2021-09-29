@@ -11,6 +11,7 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTube.Builder;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import lavaplayer.PlayerManager;
+import lavaplayer.GuildMusicManager;
 import net.Mega2223.utils.PingPongMatch;
 import net.Mega2223.utils.TextFileModifier;
 import net.Mega2223.utils.Janela;
@@ -538,7 +539,7 @@ public class aguaBot {
 
 
         public void onGuildVoiceJoin(GuildVoiceJoinEvent ev) {
-            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getGuild().getName() + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName()   + "] -> " + ev.getChannelJoined().getName() + " (" + ev.getGuild().getName() + ")\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -547,7 +548,7 @@ public class aguaBot {
         }
 
         public void onGuildVoiceLeave(GuildVoiceLeaveEvent ev) {
-            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] -> " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
+            log = log + "[" + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() + " (" + ev.getGuild().getName() + ")\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
