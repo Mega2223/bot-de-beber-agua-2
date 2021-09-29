@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -57,6 +58,7 @@ public class aguaBot {
     public static final String PROPERTIES_PATH = projectPath + "\\configs.properties";
     public static final String Mega2223ID = "301424656051732491";
     protected static final String fileCreatorPath = projectPath + "\\src\\main\\java\\net\\Mega2223\\arquivosConfidenciais";
+    protected static final String ImperioID = "606274842722959384";
     public static List<String> BOTBANNED;
     public static List<String> TRUSTED;
     public static JDABuilder builder;
@@ -79,7 +81,7 @@ public class aguaBot {
 
 
     public static void main(String[] args) throws LoginException, IOException {
-        DataInputStream inputStream = new DataInputStream(new FileInputStream(new File("C:\\Users\\Imperiums\\Desktop\\key.txt")));
+        DataInputStream inputStream = new DataInputStream(new FileInputStream(new File(projectPath+"\\key.txt")));
         String key = inputStream.readLine();
         JDAKey = key.split(" ")[0];
         YoutubeKey = key.split(" ")[1];
@@ -107,7 +109,7 @@ public class aguaBot {
         jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
         //jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
-        Imperio = jda.getGuildById("606274842722959384");
+        Imperio = jda.getGuildById(ImperioID);
         TRUSTED = new ArrayList<>();
         BOTBANNED = new ArrayList<>();
         censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
@@ -581,6 +583,19 @@ public class aguaBot {
                 e.printStackTrace();
             }
         }
+
+        public void onReconnected(ReconnectedEvent event) {
+
+            log = log + "[AVISO: RECONECTADO EM: " + Date.from(Instant.now()) + "]";
+
+
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
 
     }
 
