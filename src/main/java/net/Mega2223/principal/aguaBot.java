@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.user.UserActivityStartEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -127,6 +128,8 @@ public class aguaBot {
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
+        jda.addEventListener(new sdds());
+
 
         fer = PlayerManager.getInstance();
 
@@ -439,6 +442,18 @@ public class aguaBot {
             censoredUsers.add(jda.getUserById(cenAct));
             System.out.println("User censurado carregado: " + jda.getUserById(cenAct).getName());
         }
+    }
+
+
+    public static class sdds extends ListenerAdapter{
+        public void onUserActivityStart(UserActivityStartEvent event){
+           if(event.getMember().getUser().getId().equalsIgnoreCase(idDoPudim)){
+               jda.getUserById(Mega2223ID).openPrivateChannel().complete().sendMessage("ELE VOLTOU!").queue();
+                new notifier(jda.getSelfUser(),"ELE VOLTOU");
+                jda.getPresence().setPresence(Activity.playing("ELE VOLTOU"),true);
+           }
+        };
+
     }
 
     public static class listenersPerigosos extends ListenerAdapter {
@@ -1120,4 +1135,7 @@ public class aguaBot {
         }
 
     }
+
+    private final static String idDoPudim = "491748519984627712";
+
 }
