@@ -141,12 +141,12 @@ Printa os logs no console
 
 #### -extrai ele pra um lugar aleatório
 
-### -abre o projeto com uma IDE
+#### -abre o projeto com uma IDE
 
 #### -vai em src/main/java/net/mega2223/principal/aguaBot.java
 
-### -troca a String Mega2223ID pelo seu ID do Discord
+#### -troca a String Mega2223ID pelo seu ID do Discord
 
-### -executa a classe aguaBot
+#### -executa a classe aguaBot
 
 
