@@ -1,14 +1,6 @@
 package net.Mega2223.principal;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.GenericJson;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.YouTube.Builder;
+
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import lavaplayer.PlayerManager;
 import net.Mega2223.utils.Janela;
@@ -22,6 +14,7 @@ import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.api.events.user.UserActivityStartEvent;
@@ -29,6 +22,7 @@ import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -46,6 +40,7 @@ import java.sql.Time;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
+
 
 
 @SuppressWarnings("ALL")
@@ -72,8 +67,7 @@ public class aguaBot {
     public static String log;
     public static Properties properties;
     public static String JDAKey;
-    public static String YoutubeKey;
-    public static Builder YTbuilder;
+    public static String RedditKey;
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
@@ -84,11 +78,13 @@ public class aguaBot {
     public static void main(String[] args) throws LoginException, IOException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File(projectPath+"\\key.txt")));
         String key = inputStream.readLine();
+        inputStream.close();
         JDAKey = key.split(" ")[0];
-        YoutubeKey = key.split(" ")[1];
-        //youtube = buildYoutube(YoutubeKey);
+        RedditKey = key.split(" ")[1];
 
         System.out.println("Ativando o JDA na key " + JDAKey);
+        System.out.println("Ativando o Reddit na key " + RedditKey);
+
         builder = JDABuilder.create(JDAKey, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
         EnumSet<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS);
         builder.enableIntents(intents);
@@ -107,8 +103,8 @@ public class aguaBot {
 
         saveProperties(properties);
 
-        jda.getPresence().setStatus(OnlineStatus.INVISIBLE);
-        //jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+        jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+        jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
         Imperio = jda.getGuildById(ImperioID);
         TRUSTED = new ArrayList<>();
@@ -356,28 +352,6 @@ public class aguaBot {
 
     }
 
-    //youtube fdp
-    public static YouTube buildYoutube(final String youtubeKey) throws IllegalAccessException, InstantiationException {
-
-        HttpTransport transport = new NetHttpTransport();
-
-        JsonFactory fac = new GenericJson().getFactory();
-
-        GoogleClientSecrets clientSecrets = new GoogleClientSecrets();
-
-
-        HttpRequestInitializer initializer = new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest httpRequest) throws IOException {
-
-            }
-        };
-
-        YTbuilder = new Builder(transport, fac, initializer);
-        //YTbuilder.set
-        YouTube yt = YTbuilder.build();
-        return yt;
-    }
 
     public static boolean isPlaying(User user) {
         boolean is = false;
@@ -448,9 +422,10 @@ public class aguaBot {
     public static class sdds extends ListenerAdapter{
         public void onUserActivityStart(UserActivityStartEvent event){
            if(event.getMember().getUser().getId().equalsIgnoreCase(idDoPudim)){
-               jda.getUserById(Mega2223ID).openPrivateChannel().complete().sendMessage("ELE VOLTOU!").queue();
+                jda.getUserById(Mega2223ID).openPrivateChannel().complete().sendMessage("ELE VOLTOU!").queue();
                 new notifier(jda.getSelfUser(),"ELE VOLTOU");
                 jda.getPresence().setPresence(Activity.playing("ELE VOLTOU"),true);
+                
            }
         };
 
@@ -551,6 +526,14 @@ public class aguaBot {
 
     public static class listenersDoLog extends ListenerAdapter {
 
+        public void onGuildMessageDelete(GuildMessageDeleteEvent ev){
+            log = log + "["+ev.getGuild().getName() +" | "+ Time.from(Instant.now()) +" |  #" + ev.getChannel().getName() + " | DELETE]:" + ev.getMessageId() +"\n";
+            try {
+                writeInLog(log);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
         public void onGuildVoiceJoin(GuildVoiceJoinEvent ev) {
             log = log + "["  + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelJoined().getName() +"\n";
@@ -572,11 +555,28 @@ public class aguaBot {
 
         public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 
+            List<MessageEmbed> embeds = event.getMessage().getEmbeds();
 
             if (!event.getMessage().getAuthor().isBot()) {
-                System.out.println("Pessoa: [" + event.getAuthor().getName() +"]Guild: [" + event.getGuild().getName() +"] Mensagem: " + event.getMessage().getContentRaw());
-                log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + "]: " + event.getMessage().getContentRaw() + "\n";
+                System.out.println("Pessoa: [" + event.getAuthor().getName() +"] Guild: [" + event.getGuild().getName() +"] ID:"+event.getMessageId()+" Mensagem: " + event.getMessage().getContentRaw());
+                log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + " | " + event.getMessageId() +"]: " + event.getMessage().getContentRaw() + "\n";
             }
+
+            else if (embeds.size() >= 1) {
+                //System.out.println();
+                //System.out.println(event.getAuthor().getName() + ": " + embeds.get(0).getFooter().getText());
+                log = log + "["
+                        + event.getGuild().getName() +
+                        " | #" + event.getChannel().getName() +
+                        " | " + Date.from(Instant.now()) + " | " +
+                        event.getAuthor().getName()+ " | " +
+                        event.getMessageId() +"]: <<<" +
+                        embeds.get(0).toData().toString() +
+
+                        ">>>\n";
+
+            }
+
 
             try {
                 writeInLog(log);
