@@ -134,3 +134,19 @@ Printa os logs no console
 #### ~documentação tá horrível
 
 #### ~2020 era pra ser 2021 tecnicamente
+
+##Setup
+
+#### -clona o repositório
+
+#### -extrai ele pra um lugar aleatório
+
+#### -abre o projeto com uma IDE
+
+#### -vai em src/main/java/net/mega2223/principal/aguaBot.java
+
+#### -troca a String Mega2223ID pelo seu ID do Discord
+
+#### -executa a classe aguaBot
+
+
