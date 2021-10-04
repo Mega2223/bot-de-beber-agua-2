@@ -105,7 +105,7 @@ public class aguaBot {
         log = loadLog() + "\n";
 
         reddit = RedditApi.getRedditInstance("Eba");
-        System.out.println(RedditKey.length);
+
         redditUser = reddit.login(RedditKey[0],RedditKey[1],RedditKey[2],RedditKey[3] );//user password clientID clientSecret
 
         try {/*Thread.sleep(7000);*/
@@ -1128,14 +1128,27 @@ public class aguaBot {
 
             } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())){
                     System.out.println(log);
-            } else if (rawSplit[0].equalsIgnoreCase("-redditpost") && isTrusted(event.getAuthor())){
-                String content = "";
-                for(int f = 3; f < rawSplit.length; f++){
-                    content = content + rawSplit[f] + " ";
-                }
-                System.out.println(properties.getProperty("botSub"));
-                makePost(properties.getProperty("botSub").toLowerCase(),rawSplit[2],content,event, false);
+            } else if (rawSplit[0].contains("-redditpost")){
+                Message legal = event.getChannel().sendMessage("Ok perai").complete();
 
+                String enterSplit[] = message.getContentRaw().split("\n");
+
+                if (enterSplit.length < 3){event.getChannel().sendMessage("tem que ter 3 argumentos seu otário").queue();return;}
+
+                String content = enterSplit[2];
+
+                makePost(properties.getProperty("botSub").toLowerCase(),enterSplit[1],content,event, false);
+                legal.delete().queue();
+            } else if (rawSplit[0].contains("-redditimage") && isTrusted(event.getAuthor())){
+                String embed;
+                        try{ embed = event.getMessage().getEmbeds().get(0).getImage().getUrl();}catch( IndexOutOfBoundsException | NullPointerException e){
+                            embed = message.getAttachments().get(0).getUrl();
+                }
+
+                Message legal = event.getChannel().sendMessage("Ok perai").complete();
+
+                makePost(properties.getProperty("botSub").toLowerCase(),"",embed,event, true);
+                legal.delete().queue();
             }
 
         }
@@ -1153,21 +1166,17 @@ public class aguaBot {
     public static void makePost(String subredditS, String postTString,String postContent, GuildMessageReceivedEvent event, boolean isLink){
         String postType = "self";
         reddit.getSubreddit(properties.getProperty("botSub")).getNew(1).get(0).reply("gay");
-        //if(isLink){postType = "link";}
-        System.out.println(subredditS);
-        System.out.println(postTString);
-        System.out.println(postContent);
-        System.out.println(postType);
+        if(isLink){postType = "link";}
 
-        //reddit.getRedditInstance().Submit("mega2223", "cavalos", "e sorte e coiasa","self");
+        //literalmente a coisa mais burra que eu precisei fazer
+        String AN = event.getAuthor().getName();
+        reddit.submit(subredditS, AN + ":" + postTString.replace(" ","-"), postContent.replace(" ", "-"),postType);
 
-        try{
-            reddit.getRedditInstance().Submit(subredditS, postTString, postContent,"self");
-            Thread.sleep(1000);
-        } catch(RedditJerkException | NullPointerException | InterruptedException e){}
-
-
+        System.out.println("sleep");
+        try{Thread.sleep(3000);} catch (InterruptedException e){}
+        System.out.println("slept");
         Link post = reddit.getSubreddit(subredditS).getNew(1).get(0);
+
         if(post.getAuthor().equals(redditUser.getName())){
 
             event.getChannel().sendMessage("https://www.reddit.com"+post.getPermalink()).queue();
