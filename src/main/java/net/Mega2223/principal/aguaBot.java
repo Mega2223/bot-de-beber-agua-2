@@ -2,6 +2,13 @@ package net.Mega2223.principal;
 
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
+import ga.dryco.redditjerk.api.PostApi;
+import ga.dryco.redditjerk.api.Reddit;
+import ga.dryco.redditjerk.exceptions.RedditJerkException;
+import ga.dryco.redditjerk.implementation.RedditApi;
+import ga.dryco.redditjerk.wrappers.Link;
+import ga.dryco.redditjerk.wrappers.Post;
+import ga.dryco.redditjerk.wrappers.Subreddit;
 import lavaplayer.PlayerManager;
 import net.Mega2223.utils.Janela;
 import net.Mega2223.utils.PingPongMatch;
@@ -61,17 +68,20 @@ public class aguaBot {
     public static JDA jda;
     public static TextChannel canalDoBot;
     public static Guild Imperio;
+    public static Subreddit subDoBot;
     public static ListenerAdapter Perigosos;
     public static PlayerManager fer;
     public static ListenerAdapter kik;
     public static String log;
     public static Properties properties;
     public static String JDAKey;
-    public static String RedditKey;
+    public static String RedditKey[];
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
     public static List<User> censoredUsers;
+    public static RedditApi reddit;
+    public static ga.dryco.redditjerk.wrappers.User redditUser;
     protected static String TCBotID;
 
 
@@ -80,18 +90,23 @@ public class aguaBot {
         String key = inputStream.readLine();
         inputStream.close();
         JDAKey = key.split(" ")[0];
-        RedditKey = key.split(" ")[1];
+        RedditKey = key.split(" ")[1].split(";");
 
         System.out.println("Ativando o JDA na key " + JDAKey);
-        System.out.println("Ativando o Reddit na key " + RedditKey);
+        System.out.println("Ativando o Reddit nas keys " + key.split(" ")[1]);
 
         builder = JDABuilder.create(JDAKey, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
         EnumSet<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS);
         builder.enableIntents(intents);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.enableCache(CacheFlag.ACTIVITY);
+
         jda = builder.build();
         log = loadLog() + "\n";
+
+        reddit = RedditApi.getRedditInstance("Eba");
+        System.out.println(RedditKey.length);
+        redditUser = reddit.login(RedditKey[0],RedditKey[1],RedditKey[2],RedditKey[3] );//user password clientID clientSecret
 
         try {/*Thread.sleep(7000);*/
             jda.awaitReady();
@@ -106,28 +121,18 @@ public class aguaBot {
         jda.getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
         jda.getPresence().setActivity(Activity.streaming("sua mãe pelada", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"));
 
-        Imperio = jda.getGuildById(ImperioID);
-        TRUSTED = new ArrayList<>();
-        BOTBANNED = new ArrayList<>();
-        censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
-        Notifiers = new ArrayList<>();
-        universalMatches = new ArrayList<>();
-        TCBotID = properties.getProperty("botchannel");
+        setStaticObjects();
 
         initalizeLists();
 
         Imperio.loadMembers();
         Imperio.getMemberCache();
 
-        canalDoBot = jda.getTextChannelById(TCBotID);
+
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
-        jda.addEventListener(new sdds());
-
-
-        fer = PlayerManager.getInstance();
 
         log = log + "[BOT LIGADO EM: " + Time.from(Instant.now()) + "]\n";
         writeInLog(log);
@@ -143,6 +148,20 @@ public class aguaBot {
         }
 
         mensagemfoda.delete().queue();
+    }
+
+    private static void setStaticObjects() {
+        Imperio = jda.getGuildById(ImperioID);
+        TRUSTED = new ArrayList<>();
+        BOTBANNED = new ArrayList<>();
+        censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
+        Notifiers = new ArrayList<>();
+        universalMatches = new ArrayList<>();
+        TCBotID = properties.getProperty("botchannel");
+        fer = PlayerManager.getInstance();
+        canalDoBot = jda.getTextChannelById(TCBotID);
+        subDoBot = reddit.getSubreddit(properties.getProperty("botSub"));
+
     }
 
     public static boolean isBotBanned(User user) {
@@ -1109,6 +1128,14 @@ public class aguaBot {
 
             } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())){
                     System.out.println(log);
+            } else if (rawSplit[0].equalsIgnoreCase("-redditpost") && isTrusted(event.getAuthor())){
+                String content = "";
+                for(int f = 3; f < rawSplit.length; f++){
+                    content = content + rawSplit[f] + " ";
+                }
+                System.out.println(properties.getProperty("botSub"));
+                makePost(properties.getProperty("botSub").toLowerCase(),rawSplit[2],content,event, false);
+
             }
 
         }
@@ -1123,6 +1150,34 @@ public class aguaBot {
 
     }
 
-    private final static String idDoPudim = "491748519984627712";
+    public static void makePost(String subredditS, String postTString,String postContent, GuildMessageReceivedEvent event, boolean isLink){
+        String postType = "self";
+        reddit.getSubreddit(properties.getProperty("botSub")).getNew(1).get(0).reply("gay");
+        //if(isLink){postType = "link";}
+        System.out.println(subredditS);
+        System.out.println(postTString);
+        System.out.println(postContent);
+        System.out.println(postType);
+
+        //reddit.getRedditInstance().Submit("mega2223", "cavalos", "e sorte e coiasa","self");
+
+        try{
+            reddit.getRedditInstance().Submit(subredditS, postTString, postContent,"self");
+            Thread.sleep(1000);
+        } catch(RedditJerkException | NullPointerException | InterruptedException e){}
+
+
+        Link post = reddit.getSubreddit(subredditS).getNew(1).get(0);
+        if(post.getAuthor().equals(redditUser.getName())){
+
+            event.getChannel().sendMessage("https://www.reddit.com"+post.getPermalink()).queue();
+        }
+        else {
+            System.out.println(redditUser.getName() + ":" + post.getAuthor());
+        }
+
+
+
+    }
 
 }
