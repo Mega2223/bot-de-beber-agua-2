@@ -418,19 +418,6 @@ public class aguaBot {
         }
     }
 
-
-    public static class sdds extends ListenerAdapter{
-        public void onUserActivityStart(UserActivityStartEvent event){
-           if(event.getMember().getUser().getId().equalsIgnoreCase(idDoPudim)){
-                jda.getUserById(Mega2223ID).openPrivateChannel().complete().sendMessage("ELE VOLTOU!").queue();
-                new notifier(jda.getSelfUser(),"ELE VOLTOU");
-                jda.getPresence().setPresence(Activity.playing("ELE VOLTOU"),true);
-                
-           }
-        };
-
-    }
-
     public static class listenersPerigosos extends ListenerAdapter {
         public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
             //System.out.println(event.getGuild().getId() + " != " +  Imperio.getId() + " / " + event.getMember().getUser().getName() + " / " + event.getGuild().getName());
