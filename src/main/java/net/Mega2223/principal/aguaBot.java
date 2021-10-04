@@ -1151,33 +1151,7 @@ public class aguaBot {
     }
 
     public static void makePost(String subredditS, String postTString,String postContent, GuildMessageReceivedEvent event, boolean isLink){
-        String postType = "self";
-        reddit.getSubreddit(properties.getProperty("botSub")).getNew(1).get(0).reply("gay");
-        //if(isLink){postType = "link";}
-        System.out.println(subredditS);
-        System.out.println(postTString);
-        System.out.println(postContent);
-        System.out.println(postType);
-
-        //reddit.getRedditInstance().Submit("mega2223", "cavalos", "e sorte e coiasa","self");
-
-        try{
-            reddit.getRedditInstance().Submit(subredditS, postTString, postContent,"self");
-            Thread.sleep(1000);
-        } catch(RedditJerkException | NullPointerException | InterruptedException e){}
-
-
-        Link post = reddit.getSubreddit(subredditS).getNew(1).get(0);
-        if(post.getAuthor().equals(redditUser.getName())){
-
-            event.getChannel().sendMessage("https://www.reddit.com"+post.getPermalink()).queue();
-        }
-        else {
-            System.out.println(redditUser.getName() + ":" + post.getAuthor());
-        }
-
-
-
+        //todo
     }
 
 }
