@@ -42,9 +42,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 
-
-@SuppressWarnings("ALL")
-
+@SuppressWarnings({"Typo", "unused","String concatenation"})
 public class aguaBot {
 
 
@@ -67,7 +65,7 @@ public class aguaBot {
     public static String log;
     public static Properties properties;
     public static String JDAKey;
-    public static String RedditKey[];
+    public static String[] RedditKey;
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
@@ -273,11 +271,10 @@ public class aguaBot {
         return retorno;
     }
 
-
+    /**
+     * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
+     * */
     public static void writeInLog(String what) throws FileNotFoundException {
-        /**
-         * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
-         * */
 
         //System.out.println("Pegando o log em " +LOG_PATH);
         log = log.replace("null\n", "");

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Main-Class: net.Mega2223.principal.aguaBot
+Class-Path: lavaplayer-1.3.77.jar lavaplayer-natives-1.3.14.jar guava-30
+ .1.1-android.jar listenablefuture-9999.0-empty-to-avoid-conflict-with-g
+ uava.jar commons-io-2.6.jar lava-common-1.1.2.jar google-api-client-1.3
+ 2.1.jar commons-codec-1.11.jar opencensus-api-0.28.0.jar google-http-cl
+ ient-gson-1.39.2.jar jsoup-1.12.1.jar JDA-4.3.0_324-withDependencies.ja
+ r gson-2.8.6.jar failureaccess-1.0.1.jar opencensus-contrib-http-util-0
+ .28.0.jar slf4j-api-1.7.25.jar jackson-mapper-asl-1.9.4.jar jackson-dat
+ abind-2.10.0.jar httpcore-4.4.14.jar j2objc-annotations-1.3.jar error_p
+ rone_annotations-2.5.1.jar google-http-client-1.39.2.jar grpc-context-1
+ .27.2.jar commons-logging-1.2.jar checker-compat-qual-2.5.5.jar google-
+ oauth-client-1.31.5.jar base64-2.3.9.jar jackson-core-2.10.0.jar jackso
+ n-core-asl-1.9.4.jar google-api-services-youtube-v3-rev20210915-1.32.1.
+ jar httpclient-4.5.13.jar jsr305-3.0.2.jar google-http-client-apache-v2
+ -1.39.2.jar jackson-annotations-2.10.0.jar
+
