@@ -2,12 +2,8 @@ package net.Mega2223.principal;
 
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
-import ga.dryco.redditjerk.api.PostApi;
-import ga.dryco.redditjerk.api.Reddit;
-import ga.dryco.redditjerk.exceptions.RedditJerkException;
 import ga.dryco.redditjerk.implementation.RedditApi;
 import ga.dryco.redditjerk.wrappers.Link;
-import ga.dryco.redditjerk.wrappers.Post;
 import ga.dryco.redditjerk.wrappers.Subreddit;
 import lavaplayer.PlayerManager;
 import net.Mega2223.utils.Janela;
@@ -24,12 +20,10 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.api.events.user.UserActivityStartEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateActivitiesEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -48,11 +42,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 
-
-
-@SuppressWarnings("ALL")
-
-@Deprecated
+@SuppressWarnings({"Typo", "unused","String concatenation"})
 public class aguaBot {
 
 
@@ -75,7 +65,7 @@ public class aguaBot {
     public static String log;
     public static Properties properties;
     public static String JDAKey;
-    public static String RedditKey[];
+    public static String[] RedditKey;
     public static List<notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
@@ -86,7 +76,7 @@ public class aguaBot {
 
 
     public static void main(String[] args) throws LoginException, IOException {
-        DataInputStream inputStream = new DataInputStream(new FileInputStream(new File(projectPath+"\\key.txt")));
+        DataInputStream inputStream = new DataInputStream(new FileInputStream(new File(projectPath + "\\key.txt")));
         String key = inputStream.readLine();
         inputStream.close();
         JDAKey = key.split(" ")[0];
@@ -101,12 +91,15 @@ public class aguaBot {
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
         builder.enableCache(CacheFlag.ACTIVITY);
 
+        //C:\Users\Imperiums\AppData\Local\Temp\idea_classpath1721244032 net.Mega2223.principal.aguaBot
+        //Ativando
+
         jda = builder.build();
         log = loadLog() + "\n";
 
-        reddit = RedditApi.getRedditInstance("Eba");
-        System.out.println(RedditKey.length);
-        redditUser = reddit.login(RedditKey[0],RedditKey[1],RedditKey[2],RedditKey[3] );//user password clientID clientSecret
+        reddit = RedditApi.getRedditInstance(RedditKey[0] + "\\" + new Random().nextInt());
+
+        redditUser = reddit.login(RedditKey[0], RedditKey[1], RedditKey[2], RedditKey[3]);//user password clientID clientSecret
 
         try {/*Thread.sleep(7000);*/
             jda.awaitReady();
@@ -127,7 +120,6 @@ public class aguaBot {
 
         Imperio.loadMembers();
         Imperio.getMemberCache();
-
 
 
         jda.addEventListener(new seraQueEuLembroComoUsaEventListeners());
@@ -275,14 +267,14 @@ public class aguaBot {
         }
         iStream.close();
         //System.out.println(retorno);
+        //System.out.println(retorno + "g");
         return retorno;
     }
 
-
+    /**
+     * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
+     * */
     public static void writeInLog(String what) throws FileNotFoundException {
-        /**
-         * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
-         * */
 
         //System.out.println("Pegando o log em " +LOG_PATH);
         log = log.replace("null\n", "");
@@ -437,6 +429,35 @@ public class aguaBot {
         }
     }
 
+    public static void makePost(String subredditS, String postTString, String postContent, GuildMessageReceivedEvent event, boolean isLink) {
+        String postType = "self";
+        //reddit.getSubreddit(properties.getProperty("botSub")).getNew(1).get(0).reply("gay");
+        if (isLink) {
+            postType = "link";
+        }
+
+        //literalmente a coisa mais burra que eu precisei fazer
+        String AN = event.getAuthor().getName();
+        reddit.submit(subredditS, AN + ":" + postTString /*.replace(" ","-")*/, postContent/*.replace(" ", "-")*/, postType);
+
+        System.out.println("sleep");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+        }
+        System.out.println("slept");
+        Link post = reddit.getSubreddit(subredditS).getNew(1).get(0);
+
+        if (post.getAuthor().equals(redditUser.getName())) {
+
+            event.getChannel().sendMessage("https://www.reddit.com" + post.getPermalink()).queue();
+        } else {
+            System.out.println(redditUser.getName() + ": " + post.getAuthor());
+        }
+
+
+    }
+
     public static class listenersPerigosos extends ListenerAdapter {
         public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
             //System.out.println(event.getGuild().getId() + " != " +  Imperio.getId() + " / " + event.getMember().getUser().getName() + " / " + event.getGuild().getName());
@@ -532,8 +553,8 @@ public class aguaBot {
 
     public static class listenersDoLog extends ListenerAdapter {
 
-        public void onGuildMessageDelete(GuildMessageDeleteEvent ev){
-            log = log + "["+ev.getGuild().getName() +" | "+ Time.from(Instant.now()) +" |  #" + ev.getChannel().getName() + " | DELETE]:" + ev.getMessageId() +"\n";
+        public void onGuildMessageDelete(GuildMessageDeleteEvent ev) {
+            log = log + "[" + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " |  #" + ev.getChannel().getName() + " | DELETE]:" + ev.getMessageId() + "\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -542,7 +563,7 @@ public class aguaBot {
         }
 
         public void onGuildVoiceJoin(GuildVoiceJoinEvent ev) {
-            log = log + "["  + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelJoined().getName() +"\n";
+            log = log + "[" + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelJoined().getName() + "\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -551,7 +572,7 @@ public class aguaBot {
         }
 
         public void onGuildVoiceLeave(GuildVoiceLeaveEvent ev) {
-            log = log + "["  + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() +"\n";
+            log = log + "[" + ev.getGuild().getName() + " | " + Time.from(Instant.now()) + " | " + ev.getMember().getUser().getName() + "] <- " + ev.getChannelLeft().getName() + "\n";
             try {
                 writeInLog(log);
             } catch (FileNotFoundException e) {
@@ -564,19 +585,17 @@ public class aguaBot {
             List<MessageEmbed> embeds = event.getMessage().getEmbeds();
 
             if (!event.getMessage().getAuthor().isBot()) {
-                System.out.println("Pessoa: [" + event.getAuthor().getName() +"] Guild: [" + event.getGuild().getName() +"] ID:"+event.getMessageId()+" Mensagem: " + event.getMessage().getContentRaw());
-                log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + " | " + event.getMessageId() +"]: " + event.getMessage().getContentRaw() + "\n";
-            }
-
-            else if (embeds.size() >= 1) {
+                System.out.println("Pessoa: [" + event.getAuthor().getName() + "] Guild: [" + event.getGuild().getName() + "] ID:" + event.getMessageId() + " Mensagem: " + event.getMessage().getContentRaw());
+                log = log + "[" + event.getGuild().getName() + " | #" + event.getChannel().getName() + " | " + Date.from(Instant.now()) + " | " + event.getMember().getEffectiveName() + " | " + event.getMessageId() + "]: " + event.getMessage().getContentRaw() + "\n";
+            } else if (embeds.size() >= 1) {
                 //System.out.println();
                 //System.out.println(event.getAuthor().getName() + ": " + embeds.get(0).getFooter().getText());
                 log = log + "["
                         + event.getGuild().getName() +
                         " | #" + event.getChannel().getName() +
                         " | " + Date.from(Instant.now()) + " | " +
-                        event.getAuthor().getName()+ " | " +
-                        event.getMessageId() +"]: <<<" +
+                        event.getAuthor().getName() + " | " +
+                        event.getMessageId() + "]: <<<" +
                         embeds.get(0).toData().toString() +
 
                         ">>>\n";
@@ -595,7 +614,7 @@ public class aguaBot {
 
         public void onDisconnect(DisconnectEvent event) {
 
-            log = log + "[AVISO: DESCONECTADO EM: " + Date.from(Instant.now()) + " | " +  event.getCloseCode() + "]";
+            log = log + "[AVISO: DESCONECTADO EM: " + Date.from(Instant.now()) + " | " + event.getCloseCode() + "]";
 
 
             try {
@@ -621,7 +640,6 @@ public class aguaBot {
     }
 
     public static class seraQueEuLembroComoUsaEventListeners extends ListenerAdapter { //lembro?
-
 
 
         public void onGuildVoiceJoin(final GuildVoiceJoinEvent event) {
@@ -1126,16 +1144,37 @@ public class aguaBot {
                 }
 
 
-            } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())){
-                    System.out.println(log);
-            } else if (rawSplit[0].equalsIgnoreCase("-redditpost") && isTrusted(event.getAuthor())){
-                String content = "";
-                for(int f = 3; f < rawSplit.length; f++){
-                    content = content + rawSplit[f] + " ";
-                }
-                System.out.println(properties.getProperty("botSub"));
-                makePost(properties.getProperty("botSub").toLowerCase(),rawSplit[2],content,event, false);
+            } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())) {
+                System.out.println(log);
+            } else if (rawSplit[0].contains("-redditpost")) {
+                Message legal = event.getChannel().sendMessage("Ok perai").complete();
 
+                String enterSplit[] = message.getContentRaw().split("\n");
+
+                if (enterSplit.length < 3) {
+                    event.getChannel().sendMessage("tem que ter 3 argumentos seu otário").queue();
+                    return;
+                }
+
+                String content = "";
+                for (int f = 2; f < enterSplit.length; f++) {
+                    content = content + enterSplit[f] + "\n\n";
+                }
+
+                makePost(properties.getProperty("botSub").toLowerCase(), enterSplit[1], content, event, false);
+                legal.delete().queue();
+            } else if (rawSplit[0].contains("-redditimage") && isTrusted(event.getAuthor())) {
+                String embed;
+                try {
+                    embed = event.getMessage().getEmbeds().get(0).getImage().getUrl();
+                } catch (IndexOutOfBoundsException | NullPointerException e) {
+                    embed = message.getAttachments().get(0).getUrl();
+                }
+
+                Message legal = event.getChannel().sendMessage("Ok perai").complete();
+
+                makePost(properties.getProperty("botSub").toLowerCase(), "", embed, event, true);
+                legal.delete().queue();
             }
 
         }
@@ -1148,10 +1187,6 @@ public class aguaBot {
             properties.setProperty("censored", toCensor.toString());
         }
 
-    }
-
-    public static void makePost(String subredditS, String postTString,String postContent, GuildMessageReceivedEvent event, boolean isLink){
-        //todo
     }
 
 }
