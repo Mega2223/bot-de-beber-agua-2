@@ -2,8 +2,8 @@
 log.txt
 configs.properties
 banList.txt
-src/java/net/Mega2223/arquivosConfidenciais/
+src/net/Mega2223/arquivosConfidenciais/
 target
-src/java/META-INF/
+src/META-INF/
 .idea/artifacts/
 key.txt

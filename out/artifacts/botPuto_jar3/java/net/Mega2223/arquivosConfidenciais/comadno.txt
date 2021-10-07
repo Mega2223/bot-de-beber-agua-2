@@ -1,1 +1,0 @@
--javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2020.2.3\lib\idea_rt.jar=58581:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2020.2.3\bin" -Dfile.encoding=UTF-8 -classpath C:\Users\Imperiums\AppData\Local\Temp\classpath1869471384.jar net.Mega2223.principal.aguaBot
