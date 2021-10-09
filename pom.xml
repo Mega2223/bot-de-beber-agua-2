@@ -3,15 +3,13 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <properties>
-        <exec.mainClass>net.Mega2223.principal.aguaBot</exec.mainClass>
-    </properties>
 
 
     <groupId>net.Mega2223</groupId>
     <artifactId>bot-de-beber-agua-2</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -28,7 +26,14 @@
                 <version>3.2.0</version>
                 <configuration>
                     <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <archive>
+                            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        </archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+
+                            <mainClass>net.Mega2223.principal.aguaBot</mainClass>
+                        </manifest>
                     </archive>
                 </configuration>
             </plugin>
