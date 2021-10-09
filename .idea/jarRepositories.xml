@@ -12,6 +12,11 @@
       <option name="url" value="https://m2.dv8tion.net/releases" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="RedditJerk" />
+      <option name="name" value="ga.dryco.RedditJerk" />
+      <option name="url" value="https://github.com/euparkeria/RedditJerk" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />
