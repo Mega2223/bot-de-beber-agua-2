@@ -127,7 +127,7 @@ Printa os logs no console
 
 ## Problemas conhecidos:
 
-#### ~is comandos tão com uma sintaxe maluca
+#### ~os comandos tão com uma sintaxe maluca
 
 #### ~else if pra caramba
 
