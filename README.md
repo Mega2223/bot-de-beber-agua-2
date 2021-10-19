@@ -113,26 +113,26 @@ Dá um reporte dos servers que o bot tá.
 #### -report (só pra quem tem user confiado)
 Dá um reporte dos servers que o bot tá com mais detalhes.
 
-#### -shutdown (só eu posso usar)
+#### -shutdown (só o user que roda o bot pode usar)
 Desliga o bot e a máquina virtual por completo.
 
-#### -cleannotifiers (só eu posso usar)
+#### -cleannotifiers (só o user que roda o bot pode usar)
 Tira todos os popups gerados pelo -mega.
 
-#### -webhook (só eu posso usar)
+#### -webhook (só o user que roda o bot pode usar)
 Cria um webhook, atualmente é meio quebrado.
 
-#### -pritlog (só eu posso usar)
+#### -printlog (só o user que roda o bot pode usar)
 Printa os logs no console
 
 ## Problemas conhecidos:
 
-#### ~os comandos tão com uma sintaxe maluca
+#### ~Os comandos tão com uma sintaxe maluca
 
-#### ~else if pra caramba
+#### ~Else if pra caramba na classe main
 
-#### ~documentação tá horrível
+#### ~Documentação tá horrível
 
 #### ~2020 era pra ser 2021 tecnicamente
 
-
+#### ~Dar setup nesse bot é um sufoco, e o compilador do Maven não funciona
