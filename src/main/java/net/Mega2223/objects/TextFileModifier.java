@@ -1,4 +1,4 @@
-package net.Mega2223.utils;
+package net.Mega2223.objects;
 
 import java.io.*;
 import java.util.ArrayList;

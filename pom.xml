@@ -26,14 +26,7 @@
                 <version>3.2.0</version>
                 <configuration>
                     <archive>
-                        <archive>
-                            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                        </archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-
-                            <mainClass>net.Mega2223.principal.aguaBot</mainClass>
-                        </manifest>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>

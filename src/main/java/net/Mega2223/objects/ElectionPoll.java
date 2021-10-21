@@ -1,4 +1,4 @@
-package net.Mega2223.utils;
+package net.Mega2223.objects;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

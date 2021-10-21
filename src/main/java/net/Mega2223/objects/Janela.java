@@ -1,4 +1,4 @@
-package net.Mega2223.utils;
+package net.Mega2223.objects;
 
 import net.Mega2223.principal.aguaBot;
 import net.Mega2223.principal.notifier;
@@ -16,7 +16,7 @@ public class Janela extends JFrame {
     private static JLabel label1;
     private static JScrollPane container;
     private static JPanel panel;
-    private BotThread botThread;
+    private final BotThread botThread;
     private JScrollBar jScrollBar;
 
     public Janela() throws IOException {
