@@ -1,6 +1,7 @@
 package net.Mega2223.botDeBeberÁgua2.principal;
 
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
+import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
 import net.Mega2223.botDeBeberÁgua2.objects.TextFileModifier;
 import net.Mega2223.botDeBeberÁgua2.utils.aguaUtils;
 import net.dv8tion.jda.api.entities.*;
@@ -24,6 +25,9 @@ import java.util.List;
 import static net.Mega2223.botDeBeberÁgua2.principal.aguaBot.*;
 import static net.Mega2223.botDeBeberÁgua2.utils.aguaUtils.isBotBanned;
 
+/**
+ * essa classe referencia objetos estáticos, não faz mais de uma instância dela pelo amor de Deus
+ */
 public class aguaListener extends ListenerAdapter {
 
     //100x mais fácil que trocar todas as ocorrências na classe
@@ -81,7 +85,10 @@ public class aguaListener extends ListenerAdapter {
         if (censoredUsers.contains(event.getAuthor())) {
             event.getMessage().delete().queue();
             return;
-        } else if (event.getChannel().getId().equals(canalDoBot.getId()) && contentRaw.equalsIgnoreCase("-curva")) {
+        }
+
+
+        if (event.getChannel().getId().equals(canalDoBot.getId()) && contentRaw.equalsIgnoreCase("-curva")) {
             fazerUmaCurvaLegal(15, event.getChannel()); //acho que todos os else ifs deveriam seguir essa estrutura
         } else if (rawSplit[0].equalsIgnoreCase("oi") && message.getMentionedUsers().contains(jda.getSelfUser())) {
             event.getChannel().sendMessage("oi " + event.getAuthor().getAsMention() + " :)").queue();
@@ -92,14 +99,6 @@ public class aguaListener extends ListenerAdapter {
         } else if (contentRaw.equalsIgnoreCase("-disablelisteners") && isTrusted(user)) {
             jda.removeEventListener(Perigosos);
             event.getChannel().sendMessage(":thumbsdown: desativados").queue();
-        } else if (contentRaw.equalsIgnoreCase("-tiraogames")) {
-            event.getChannel().sendMessage("ok vou tirar").queue();
-            kik = new aguaBot.kicka();
-            jda.addEventListener(kik);
-            Imperio.kickVoiceMember(Imperio.getMember(jda.getUserById("638898751880036400"))).queue();
-        } else if (contentRaw.equalsIgnoreCase("-deixaogames")) {
-            event.getChannel().sendMessage("ok vou deixar").queue();
-            jda.removeEventListener(kik);
         } else if (contentRaw.equalsIgnoreCase("-entra")) {
             event.getGuild().getAudioManager().openAudioConnection(event.getMember().getVoiceState().getChannel());
             event.getChannel().sendMessage(":thumbsup: ok").queue();
@@ -108,44 +107,33 @@ public class aguaListener extends ListenerAdapter {
             event.getGuild().getAudioManager().closeAudioConnection();
         } else if (rawSplit[0].equalsIgnoreCase("-toca")) {//to;do split //eu não sei oq eu quis dizer com o cmentário aanterior mas tá bom né
             event.getChannel().sendMessage(":thumbsup: Tocarei-de-eu").queue();
-
             event.getGuild().getAudioManager().getSendingHandler();
-
-
-            //final AudioPlayerManager manager = new DefaultAudioPlayerManager();
-            //final AudioPlayer player = manager.createPlayer();
-
             try {
-                fer.loadAndPlay(event.getChannel(), rawSplit[1]);
-            } catch (InvalidDnDOperationException e) {
-
-
-            }
-
-
+                playerManager.loadAndPlay(event.getChannel(), rawSplit[1]);
+            } catch (InvalidDnDOperationException e) { }
         } else if (rawSplit[0].equals("-skip")) {
             event.getChannel().sendMessage(":thumbsup: Podeixar patrão").queue();
-
-            fer.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
+            playerManager.getGuildMusicManager(event.getGuild()).scheduler.nextTrack();
         } else if (rawSplit[0].equals("-volume")) {
             if (rawSplit.length == 2) {
                 if (Integer.parseInt(rawSplit[1]) > 100 && !isTrusted(user)) {
                     event.getChannel().sendMessage(":thumbsdown: Só os membros confiados podem colocar as coisas acima de 100 :(").queue();
                 } else {
                     event.getChannel().sendMessage(":thumbsup: Bele vamo pra " + rawSplit[1] + " de volume então").queue();
-                    fer.getGuildMusicManager(event.getGuild()).player.setVolume(Integer.parseInt(rawSplit[1]));
+                    playerManager.getGuildMusicManager(event.getGuild()).player.setVolume(Integer.parseInt(rawSplit[1]));
 
                 }
             }
+        } else if (rawSplit[0].equals("-shuffle")) {
+            playerManager.getGuildMusicManager(event.getGuild()).scheduler.shuffle();
+
         } else if (contentRaw.equalsIgnoreCase("-shutdown") && event.getAuthor().getId().equalsIgnoreCase(Mega2223ID)) {
             event.getChannel().sendMessage(":thumbsup: flw patrão").queue();
             jda.shutdown();
-
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
             }
-
             System.exit(0);
         } else if (rawSplit[0].equalsIgnoreCase("-status") && isTrusted(event.getAuthor())) {
             jda.getPresence().setPresence(Activity.streaming(rawSplit[1], rawSplit[2]), true);
@@ -155,12 +143,12 @@ public class aguaListener extends ListenerAdapter {
             for (int g = 1; g < rawSplit.length; g++) {
                 args = args + rawSplit[g] + " ";
             }
-            Notifiers.add(new notifier(event.getAuthor(), args));
+            Notifiers.add(new Notifier(event.getAuthor(), args));
             event.getChannel().sendMessage("notifiquei o puto").queue();
 
         } else if (rawSplit[0].equalsIgnoreCase("-mega") && message.getAttachments().size() >= 1) {
             try {
-                Notifiers.add(new notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl())));
+                Notifiers.add(new Notifier(event.getAuthor(), new URL(message.getAttachments().get(0).getUrl())));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -448,9 +436,8 @@ public class aguaListener extends ListenerAdapter {
             System.out.print(out);
             event.getChannel().sendMessage(out).queue();
         } else if (rawSplit[0].equalsIgnoreCase("-cleannotifiers") && event.getAuthor().getId().equals(Mega2223ID)) {
-            for (net.Mega2223.botDeBeberÁgua2.principal.notifier notifier : Notifiers) {
+            for (Notifier notifier : Notifiers) {
                 notifier.dispose();
-
             }
             Notifiers.clear();
 

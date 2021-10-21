@@ -7,6 +7,7 @@ import ga.dryco.redditjerk.wrappers.Link;
 import ga.dryco.redditjerk.wrappers.Subreddit;
 import lavaplayer.PlayerManager;
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
+import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
 import net.Mega2223.botDeBeberÁgua2.objects.PingPongMatch;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -58,13 +59,13 @@ public class aguaBot {
     public static Guild Imperio;
     public static Subreddit subDoBot;
     public static ListenerAdapter Perigosos;
-    public static PlayerManager fer;
+    public static PlayerManager playerManager;
     public static ListenerAdapter kik;
     public static String log;
     public static Properties properties;
     public static String JDAKey;
     public static String[] RedditKey;
-    public static List<notifier> Notifiers;
+    public static List<Notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
     public static List<User> censoredUsers;
@@ -152,7 +153,7 @@ public class aguaBot {
         waterUrls = new ArrayList<>();
         universalMatches = new ArrayList<>();
         TCBotID = properties.getProperty("botchannel");
-        fer = PlayerManager.getInstance();
+        playerManager = PlayerManager.getInstance();
         canalDoBot = jda.getTextChannelById(TCBotID);
         subDoBot = reddit.getSubreddit(properties.getProperty("botSub"));
 

@@ -1,7 +1,6 @@
 package net.Mega2223.botDeBeberÁgua2.objects;
 
 import net.Mega2223.botDeBeberÁgua2.principal.aguaBot;
-import net.Mega2223.botDeBeberÁgua2.principal.notifier;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,7 +73,7 @@ public class Janela extends JFrame {
 
         @Override
         public void run() {
-            String setWhat = notifier.ConvertToHTML(aguaBot.log.split("\n"));
+            String setWhat = Notifier.ConvertToHTML(aguaBot.log.split("\n"));
             //System.out.println(setWhat);
             label1.setText(setWhat);
             container.setSize(getSize());

@@ -49,6 +49,7 @@ public class PlayerManager {
         return musicManager;
     }
 
+
     public void loadAndPlay(final TextChannel channel, final String trackUrl) {
         GuildMusicManager f = getGuildMusicManager(channel.getGuild());
         final GuildMusicManager musicManager = f;

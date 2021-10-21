@@ -1,4 +1,4 @@
-package net.Mega2223.botDeBeberÁgua2.principal;
+package net.Mega2223.botDeBeberÁgua2.objects;
 
 import net.dv8tion.jda.api.entities.User;
 
@@ -11,12 +11,13 @@ import java.util.Random;
 
 import static net.Mega2223.botDeBeberÁgua2.principal.aguaBot.getImageByURL;
 
-public class notifier extends JFrame {
+public class Notifier extends JFrame {
     int x;
     int y;
     private JLabel label;
     private JLabel label2;
-    public notifier(final User user, final URL url) throws IOException {
+
+    public Notifier(final User user, final URL url) throws IOException {
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new FlowLayout());
@@ -49,7 +50,7 @@ public class notifier extends JFrame {
         //System.out.println("cabei");
     }
 
-    public notifier(final User user, String message) {
+    public Notifier(final User user, String message) {
         setVisible(true);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
