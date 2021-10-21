@@ -1,4 +1,4 @@
-package net.Mega2223.principal;
+package net.Mega2223.botDeBeberÁgua2.principal;
 
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
@@ -6,8 +6,8 @@ import ga.dryco.redditjerk.implementation.RedditApi;
 import ga.dryco.redditjerk.wrappers.Link;
 import ga.dryco.redditjerk.wrappers.Subreddit;
 import lavaplayer.PlayerManager;
-import net.Mega2223.objects.Janela;
-import net.Mega2223.objects.PingPongMatch;
+import net.Mega2223.botDeBeberÁgua2.objects.Janela;
+import net.Mega2223.botDeBeberÁgua2.objects.PingPongMatch;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static net.Mega2223.utils.aguaUtils.isTrusted;
+import static net.Mega2223.botDeBeberÁgua2.utils.aguaUtils.isTrusted;
 
 @SuppressWarnings({"Typo", "unused", "String concatenation"})
 public class aguaBot {
@@ -120,7 +120,7 @@ public class aguaBot {
         Imperio.getMemberCache();
 
 
-        jda.addEventListener(new aguaListeners());
+        jda.addEventListener(new aguaListener());
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
 
@@ -253,8 +253,8 @@ public class aguaBot {
      * */
     public static void writeInLog(String what) throws FileNotFoundException {
 
-        //System.out.println("Pegando o log em " +LOG_PATH);
-        log = log.replace("null\n", "");
+
+        log = log.replace("null\n", ""); //fixme isso não deveria estar aqui, tipo, o LOG nem é referenciado aqui
 
 
         OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File(LOG_PATH)));

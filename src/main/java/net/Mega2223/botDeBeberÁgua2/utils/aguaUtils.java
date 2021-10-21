@@ -1,4 +1,4 @@
-package net.Mega2223.utils;
+package net.Mega2223.botDeBeberÁgua2.utils;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -28,7 +28,6 @@ public class aguaUtils {
         return is;
     }
 
-    @SuppressWarnings("unused")
     public static boolean isTrusted(Member user, List<String> TRUSTED) {
         return isTrusted(user.getUser(), TRUSTED);
     }

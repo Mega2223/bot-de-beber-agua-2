@@ -1,4 +1,4 @@
-package net.Mega2223.principal;
+package net.Mega2223.botDeBeberÁgua2.principal;
 
 import net.dv8tion.jda.api.entities.User;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 
-import static net.Mega2223.principal.aguaBot.getImageByURL;
+import static net.Mega2223.botDeBeberÁgua2.principal.aguaBot.getImageByURL;
 
 public class notifier extends JFrame {
     int x;

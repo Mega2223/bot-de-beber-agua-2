@@ -1,4 +1,4 @@
-package net.Mega2223.objects;
+package net.Mega2223.botDeBeberÁgua2.objects;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;

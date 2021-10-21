@@ -1,7 +1,7 @@
-package net.Mega2223.objects;
+package net.Mega2223.botDeBeberÁgua2.objects;
 
-import net.Mega2223.principal.aguaBot;
-import net.Mega2223.principal.notifier;
+import net.Mega2223.botDeBeberÁgua2.principal.aguaBot;
+import net.Mega2223.botDeBeberÁgua2.principal.notifier;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static net.Mega2223.principal.aguaBot.jda;
+import static net.Mega2223.botDeBeberÁgua2.principal.aguaBot.jda;
 
 
 public class Janela extends JFrame {

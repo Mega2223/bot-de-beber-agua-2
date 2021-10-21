@@ -1,8 +1,8 @@
-package net.Mega2223.principal;
+package net.Mega2223.botDeBeberÁgua2.principal;
 
-import net.Mega2223.objects.Janela;
-import net.Mega2223.objects.TextFileModifier;
-import net.Mega2223.utils.aguaUtils;
+import net.Mega2223.botDeBeberÁgua2.objects.Janela;
+import net.Mega2223.botDeBeberÁgua2.objects.TextFileModifier;
+import net.Mega2223.botDeBeberÁgua2.utils.aguaUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -21,11 +21,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.Mega2223.principal.aguaBot.*;
-import static net.Mega2223.utils.aguaUtils.isBotBanned;
+import static net.Mega2223.botDeBeberÁgua2.principal.aguaBot.*;
+import static net.Mega2223.botDeBeberÁgua2.utils.aguaUtils.isBotBanned;
 
-public class aguaListeners extends ListenerAdapter {
+public class aguaListener extends ListenerAdapter {
 
+    //100x mais fácil que trocar todas as ocorrências na classe
     private static boolean isTrusted(User user) {
         return aguaUtils.isTrusted(user, TRUSTED);
     }
@@ -34,7 +35,6 @@ public class aguaListeners extends ListenerAdapter {
         return aguaUtils.isTrusted(user, TRUSTED);
     }
 
-    //100x mais fácil que trocar todas as ocorrências na classe
 
     public void onGuildVoiceJoin(final GuildVoiceJoinEvent event) {
         GuildVoiceState state = event.getVoiceState();
@@ -82,7 +82,7 @@ public class aguaListeners extends ListenerAdapter {
             event.getMessage().delete().queue();
             return;
         } else if (event.getChannel().getId().equals(canalDoBot.getId()) && contentRaw.equalsIgnoreCase("-curva")) {
-            fazerUmaCurvaLegal(15, event.getChannel());
+            fazerUmaCurvaLegal(15, event.getChannel()); //acho que todos os else ifs deveriam seguir essa estrutura
         } else if (rawSplit[0].equalsIgnoreCase("oi") && message.getMentionedUsers().contains(jda.getSelfUser())) {
             event.getChannel().sendMessage("oi " + event.getAuthor().getAsMention() + " :)").queue();
         } else if (contentRaw.equalsIgnoreCase("-enablelisteners") && isTrusted(user)) {
@@ -448,7 +448,7 @@ public class aguaListeners extends ListenerAdapter {
             System.out.print(out);
             event.getChannel().sendMessage(out).queue();
         } else if (rawSplit[0].equalsIgnoreCase("-cleannotifiers") && event.getAuthor().getId().equals(Mega2223ID)) {
-            for (net.Mega2223.principal.notifier notifier : Notifiers) {
+            for (net.Mega2223.botDeBeberÁgua2.principal.notifier notifier : Notifiers) {
                 notifier.dispose();
 
             }

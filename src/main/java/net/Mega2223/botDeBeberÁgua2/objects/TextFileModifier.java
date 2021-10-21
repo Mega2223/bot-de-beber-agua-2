@@ -1,4 +1,4 @@
-package net.Mega2223.objects;
+package net.Mega2223.botDeBeberÁgua2.objects;
 
 import java.io.*;
 import java.util.ArrayList;
