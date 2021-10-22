@@ -61,7 +61,7 @@ public class aguaListener extends ListenerAdapter {
         boolean isCommand;
         boolean isBanned;
 
-        isBanned = isBotBanned(event.getAuthor(), TRUSTED);
+        isBanned = isBotBanned(event.getAuthor(), BOTBANNED);
         try {
             String firstC = message.getContentRaw().substring(0, 1);
             isCommand = firstC.contains("-");
@@ -210,7 +210,7 @@ public class aguaListener extends ListenerAdapter {
             } else {
                 runPingPongMatch(event);
             }
-            System.out.println("Argumentos de pingpong: " + rawSplit.length);
+            //System.out.println("Argumentos de pingpong: " + rawSplit.length);
 
         } else if (rawSplit[0].equalsIgnoreCase("-calaaboca") && isTrusted(user)) {
 

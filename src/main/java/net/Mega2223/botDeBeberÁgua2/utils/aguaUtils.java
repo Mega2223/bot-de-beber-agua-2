@@ -7,14 +7,19 @@ import java.util.List;
 
 public class aguaUtils {
     public static boolean isBotBanned(User user, List<String> BOTBANNED) {
+        /*System.out.println("isBotBanned called");
+        System.out.println(BOTBANNED);
+        System.out.println("ID:"+user.getId());
+        System.out.println();*/
         boolean is = false;
         for (String s : BOTBANNED) {
-            //System.out.print(user.getId() + " comparando com" + s);
+            //System.out.println(s + ":" + user.getId());
             if (user.getId().equalsIgnoreCase(s)) {
                 is = true;
                 //System.out.print(user.getId() + " é igual " + s);
             }
         }
+        //System.out.println("is:" + is);
         return is;
     }
 
