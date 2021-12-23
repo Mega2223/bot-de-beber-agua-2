@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -562,6 +564,40 @@ public class aguaListener extends ListenerAdapter {
 
             //fixme POOL_EXECUTOR.scheduleAtFixedRate(new aguaBot.WaterReminder(),1,1, TimeUnit.SECONDS);
             event.getChannel().sendMessage("Ok foi").queue();
+
+        } else if (message.getContentRaw().equalsIgnoreCase("-amogus") && isTrusted(event.getAuthor())) {
+            List<Member> membros = event.getGuild().getMembers();
+            for (Member men : membros) {
+                try {
+                    men.modifyNickname(men.getEffectiveName().replace("a", "ඞ")).queue();
+                } catch (InsufficientPermissionException | HierarchyException ex) {
+                }
+            }
+            event.getChannel().sendMessage("AMOGUS").queue();
+        } else if (message.getContentRaw().equalsIgnoreCase("-unamogus") && isTrusted(event.getAuthor())) {
+            List<Member> membros = event.getGuild().getMembers();
+            for (Member men : membros) {
+                try {
+                    men.modifyNickname(men.getEffectiveName().replace("ඞ", "a")).queue();
+                } catch (InsufficientPermissionException | HierarchyException ex) {
+                }
+            }
+            event.getChannel().sendMessage("AMOGUS").queue();
+        } else if (rawSplit[0].equalsIgnoreCase("-cantacomigo")) {
+
+            try {
+                String[] manda = TextFileModifier.readFile(fileCreatorPath + "\\" + rawSplit[1]).split(rawSplit[2]);
+
+                for (int u = 0; u < manda.length - 1; u++) {
+                    try {
+                        event.getChannel().sendMessage(manda[u]).queue();
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+
+            } catch (IOException | ArrayIndexOutOfBoundsException exception) {
+                event.getChannel().sendMessage("sintaxe errada trouxa").queue();
+            }
 
         }
 
