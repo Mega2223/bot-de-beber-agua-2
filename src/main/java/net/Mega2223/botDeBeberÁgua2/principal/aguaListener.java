@@ -599,6 +599,14 @@ public class aguaListener extends ListenerAdapter {
                 event.getChannel().sendMessage("sintaxe errada trouxa").queue();
             }
 
+        } else if (rawSplit[0].equalsIgnoreCase("-lowresdimension") && isTrusted(event.getAuthor())) {
+            lowResDimUsers.addAll(event.getMessage().getMentionedMembers());
+            for (Member me : event.getMessage().getMentionedMembers()) {
+                trollTheUser(me);
+            }
+        } else if (rawSplit[0].equalsIgnoreCase("-alrightgoback") && isTrusted(event.getAuthor())) { //todo talvez eu coloque isso no arquivo de propriedades, por agora não é um problema
+            lowResDimUsers.removeAll(event.getMessage().getMentionedMembers());
+            event.getChannel().sendMessage("beleza :thumbsup:").queue();
         }
 
     }

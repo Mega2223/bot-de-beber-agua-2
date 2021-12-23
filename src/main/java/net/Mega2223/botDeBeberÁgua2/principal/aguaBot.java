@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.DisconnectEvent;
 import net.dv8tion.jda.api.events.ReconnectedEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -69,6 +70,7 @@ public class aguaBot {
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
     public static List<User> censoredUsers;
+    public static List<Member> lowResDimUsers;
     public static RedditApi reddit;
     public static ga.dryco.redditjerk.wrappers.User redditUser;
     protected static String TCBotID;
@@ -124,6 +126,7 @@ public class aguaBot {
         jda.addEventListener(new aguaListener());
         jda.addEventListener(new eventListenerParalelo());
         jda.addEventListener(new listenersDoLog());
+        jda.addEventListener(new listenersDaLowRes());
 
         log = log + "[BOT LIGADO EM: " + Time.from(Instant.now()) + "]\n";
         writeInLog(log);
@@ -149,6 +152,7 @@ public class aguaBot {
         TRUSTED = new ArrayList<>();
         BOTBANNED = new ArrayList<>();
         censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
+        lowResDimUsers = new ArrayList<>();
         Notifiers = new ArrayList<>();
         waterUrls = new ArrayList<>();
         universalMatches = new ArrayList<>();
@@ -561,6 +565,27 @@ public class aguaBot {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+
+
+    }
+
+    static void trollTheUser(Member member) {
+        if (lowResDimUsers.contains(member)) {
+            member.getGuild().moveVoiceMember(member, jda.getVoiceChannelById(properties.getProperty("lowResChannel"))).queue();
+        }
+    }
+
+    public static class listenersDaLowRes extends ListenerAdapter {
+
+        public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+            trollTheUser(event.getMember());
+        }
+
+        //public void onGuildVoiceLeave(GuildVoiceLeaveEvent event){trollTheUser(event.getMember());}
+        //isso nem faz sentido kkjkkjkak
+        public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
+            trollTheUser(event.getMember());
         }
 
 
