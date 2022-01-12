@@ -144,6 +144,8 @@ public class aguaBot {
 
         mensagemfoda.delete().queue();
 
+        //List<Member> eba = Imperio.getMembers();
+
 
     }
 
@@ -527,7 +529,7 @@ public class aguaBot {
                         " | " + Date.from(Instant.now()) + " | " +
                         event.getAuthor().getName() + " | " +
                         event.getMessageId() + "]: <<<" +
-                        embeds.get(0).toData().toString() +
+                        embeds.get(0).toData() +
 
                         ">>>\n";
 

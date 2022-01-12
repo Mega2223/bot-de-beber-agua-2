@@ -3,6 +3,7 @@ package net.Mega2223.botDeBeberÁgua2.principal;
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
 import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
 import net.Mega2223.botDeBeberÁgua2.objects.TextFileModifier;
+import net.Mega2223.botDeBeberÁgua2.utils.PoorUtils;
 import net.Mega2223.botDeBeberÁgua2.utils.aguaUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -13,7 +14,9 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
+import javax.imageio.ImageIO;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -21,6 +24,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -607,6 +612,34 @@ public class aguaListener extends ListenerAdapter {
         } else if (rawSplit[0].equalsIgnoreCase("-alrightgoback") && isTrusted(event.getAuthor())) { //todo talvez eu coloque isso no arquivo de propriedades, por agora não é um problema
             lowResDimUsers.removeAll(event.getMessage().getMentionedMembers());
             event.getChannel().sendMessage("beleza :thumbsup:").queue();
+        } else if (rawSplit[0].equalsIgnoreCase("-newJersey") && isTrusted(event.getAuthor())) {
+            int qtos = Integer.parseInt(rawSplit[1]);
+            for (int g = 0; g < qtos; g++) {
+                event.getGuild().createVoiceChannel("New Jersey").queue();
+            }
+
+        } else if (rawSplit[0].equalsIgnoreCase("-oldJersey") && isTrusted(event.getAuthor())) {
+            for (VoiceChannel ac : event.getGuild().getVoiceChannels()) {
+                if (ac.getName().equalsIgnoreCase("New Jersey")) {
+                    ac.delete().queue();
+                }
+            }
+        } else if (rawSplit[0].equalsIgnoreCase("-genpobre")) {
+            Path dir = Paths.get("C:\\Users\\Imperiums\\Desktop\\Pastas\\Espaço de programar e tals\\botPuto\\src\\main\\java\\net\\Mega2223\\Fotos de youtuber");
+
+
+            MessageAction action = event.getChannel().sendMessage("ok");
+            try {
+                BufferedImage img = PoorUtils.apobrezar(PoorUtils.getImg(dir));
+                File file = new File("legal.png");
+                ImageIO.write(img, "png", file);
+                action.addFile(file);
+                action.queue();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
     }
