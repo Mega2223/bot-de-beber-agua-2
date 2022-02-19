@@ -1,7 +1,6 @@
 package net.Mega2223.botDeBeberÁgua2.principal;
 
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import ga.dryco.redditjerk.implementation.RedditApi;
 import ga.dryco.redditjerk.wrappers.Link;
 import ga.dryco.redditjerk.wrappers.Subreddit;
@@ -131,6 +130,7 @@ public class aguaBot {
         log = log + "[BOT LIGADO EM: " + Time.from(Instant.now()) + "]\n";
         writeInLog(log);
 
+        //createConsoleListener();
 
         System.out.println("tudopronto");
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
@@ -144,9 +144,50 @@ public class aguaBot {
 
         mensagemfoda.delete().queue();
 
-        //List<Member> eba = Imperio.getMembers();
+        //List<Member> eba = Imperio.getMembers();s
+        //402804167317520385
 
+        Guild cupula = jda.getGuildById("324759074056962048");
 
+        /*for(TextChannel act : cupula.getTextChannels()){
+            List<Message> msga = act.getHistory().retrievePast(20).complete();
+            for(Message mAct : msga){
+                if(mAct.getAuthor().getId().equalsIgnoreCase("409875053308674060")){mAct.delete().queue();}
+            }
+        }*/
+
+    }
+
+    private static void createConsoleListener() {/*fixme
+        System.out.println("scheduled");
+        Console console = System.console();
+        System.out.println("scheduled");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("scheduled");
+        final List<String>[] ant = new List[]{reader.lines().collect(Collectors.toList())};
+        final int[] size = {ant[0].size()};
+        System.out.println("scheduled");
+        //muy chicke eu sei
+        ScheduledThreadPoolExecutor ex = new ScheduledThreadPoolExecutor(1);
+        System.out.println("scheduled");
+        Thread thread = new Thread(){
+            @Override
+            public void run(){
+                System.out.println("rodando");
+                ant[0] = reader.lines().collect(Collectors.toList());
+                if (size[0] != ant[0].size()){
+                    size[0] = ant[0].size();
+                    String cmd = ant[0].get(0);
+                    System.out.println("CMD:" + cmd);
+                    GuildMessageReceivedEvent event = new GuildMessageReceivedEvent(jda, 0, new FakeMessage(cmd));
+                }
+
+            }
+        };
+        System.out.println("scheduled");
+        ex.scheduleAtFixedRate(thread,0,1, TimeUnit.SECONDS);
+        System.out.println("scheduled");
+    */
     }
 
     private static void initStaticObjects() {
@@ -192,11 +233,11 @@ public class aguaBot {
         universalMatches.add(new PingPongMatch(event, intervaloNumerico, jogadas));
     }
 
-    public static void updatePingPongMatches(GuildMessageReceivedEvent event) throws InvalidArgumentException { //lembrando que tem que ter confirmação que o user tá jogando
+    public static void updatePingPongMatches(GuildMessageReceivedEvent event) { //lembrando que tem que ter confirmação que o user tá jogando
 
 
         if (!isPlaying(event.getAuthor())) {
-            throw new InvalidArgumentException(new String[]{"o user n tá jogando o cabaço"});
+            throw new IllegalArgumentException("O cara não tá jogando");
         }
 
         int isPl = getPlaying(event);
@@ -256,8 +297,15 @@ public class aguaBot {
     }
 
     /**
+     * escreve o que estiver na String log no log
+     */
+    public static void writeInLog() throws FileNotFoundException {
+        writeInLog(log);
+    }
+
+    /**
      * Escreve algo nos logs, vale lembrar que ele reescreve tudo que tava antes.
-     * */
+     */
     public static void writeInLog(String what) throws FileNotFoundException {
 
 
@@ -269,7 +317,6 @@ public class aguaBot {
         try {
             writer.write(what);
             writer.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }

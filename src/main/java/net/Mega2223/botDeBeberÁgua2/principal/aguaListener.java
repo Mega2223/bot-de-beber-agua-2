@@ -38,6 +38,7 @@ import static net.Mega2223.botDeBeberÁgua2.utils.aguaUtils.isBotBanned;
 public class aguaListener extends ListenerAdapter {
 
     //100x mais fácil que trocar todas as ocorrências na classe
+    //em minha defesa eu fiz isso antes de aprender sobre o refactor :p
     private static boolean isTrusted(User user) {
         return aguaUtils.isTrusted(user, TRUSTED);
     }
