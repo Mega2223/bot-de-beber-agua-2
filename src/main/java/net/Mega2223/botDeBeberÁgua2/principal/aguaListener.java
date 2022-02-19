@@ -535,35 +535,6 @@ public class aguaListener extends ListenerAdapter {
 
         } else if (rawSplit[0].equalsIgnoreCase("-printlog") && isTrusted(event.getAuthor())) {
             System.out.println(log);
-        } else if (rawSplit[0].contains("-redditpost")) {
-            Message legal = event.getChannel().sendMessage("Ok perai").complete();
-
-            String[] enterSplit = message.getContentRaw().split("\n");
-
-            if (enterSplit.length < 3) {
-                event.getChannel().sendMessage("tem que ter 3 argumentos seu otário").queue();
-                return;
-            }
-
-            String content = "";
-            for (int f = 2; f < enterSplit.length; f++) {
-                content = content + enterSplit[f] + "\n\n";
-            }
-
-            makePost(properties.getProperty("botSub").toLowerCase(), enterSplit[1], content, event, false);
-            legal.delete().queue();
-        } else if (rawSplit[0].contains("-redditimage") && isTrusted(event.getAuthor())) {
-            String embed;
-            try {
-                embed = event.getMessage().getEmbeds().get(0).getImage().getUrl();
-            } catch (IndexOutOfBoundsException | NullPointerException e) {
-                embed = message.getAttachments().get(0).getUrl();
-            }
-
-            Message legal = event.getChannel().sendMessage("Ok perai").complete();
-
-            makePost(properties.getProperty("botSub").toLowerCase(), "", embed, event, true);
-            legal.delete().queue();
         } else if (message.getContentRaw().equalsIgnoreCase("<@!654020411327250433>")) {
             event.getChannel().sendMessage("Bom dia " + event.getAuthor().getAsMention() + ", eu sou o Beba Água Bot, um bot de utilidades feito pelo <@!" + Mega2223ID + "> para a República Nômade e a Cúpula da Edição ;) \nSe vc quiser ver os comandos, olha o meu README.md no GitHub:\n https://github.com/Mega2223/bot-de-beber-agua-2/blob/main/README.md ").queue();
         } else if (message.getContentRaw().equalsIgnoreCase("-runnableteste")) {

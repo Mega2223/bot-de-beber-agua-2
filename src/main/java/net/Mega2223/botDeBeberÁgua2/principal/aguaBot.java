@@ -1,9 +1,5 @@
 package net.Mega2223.botDeBeberÁgua2.principal;
 
-
-import ga.dryco.redditjerk.implementation.RedditApi;
-import ga.dryco.redditjerk.wrappers.Link;
-import ga.dryco.redditjerk.wrappers.Subreddit;
 import lavaplayer.PlayerManager;
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
 import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
@@ -57,21 +53,17 @@ public class aguaBot {
     public static JDA jda;
     public static TextChannel canalDoBot;
     public static Guild Imperio;
-    public static Subreddit subDoBot;
     public static ListenerAdapter Perigosos;
     public static PlayerManager playerManager;
     public static ListenerAdapter kik;
     public static String log;
     public static Properties properties;
     public static String JDAKey;
-    public static String[] RedditKey;
     public static List<Notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
     public static List<User> censoredUsers;
     public static List<Member> lowResDimUsers;
-    public static RedditApi reddit;
-    public static ga.dryco.redditjerk.wrappers.User redditUser;
     protected static String TCBotID;
     public static List<String> waterUrls;
 
@@ -80,7 +72,7 @@ public class aguaBot {
         String key = inputStream.readLine();
         inputStream.close();
         JDAKey = key.split(" ")[0];
-        RedditKey = key.split(" ")[1].split(";");
+
 
         System.out.println("Ativando o JDA na key " + JDAKey);
         System.out.println("Ativando o Reddit nas keys " + key.split(" ")[1]);
@@ -96,10 +88,6 @@ public class aguaBot {
 
         jda = builder.build();
         log = loadLog() + "\n";
-
-        reddit = RedditApi.getRedditInstance(RedditKey[0] + "\\" + new Random().nextInt());
-
-        redditUser = reddit.login(RedditKey[0], RedditKey[1], RedditKey[2], RedditKey[3]);//user password clientID clientSecret
 
         try {/*Thread.sleep(7000);*/
             jda.awaitReady();
@@ -202,7 +190,6 @@ public class aguaBot {
         TCBotID = properties.getProperty("botchannel");
         playerManager = PlayerManager.getInstance();
         canalDoBot = jda.getTextChannelById(TCBotID);
-        subDoBot = reddit.getSubreddit(properties.getProperty("botSub"));
 
     }
 
@@ -460,34 +447,7 @@ public class aguaBot {
         }
     }
 
-    public static void makePost(String subredditS, String postTString, String postContent, GuildMessageReceivedEvent event, boolean isLink) {
-        String postType = "self";
-        //reddit.getSubreddit(properties.getProperty("botSub")).getNew(1).get(0).reply("gay");
-        if (isLink) {
-            postType = "link";
-        }
 
-        //literalmente a coisa mais burra que eu precisei fazer
-        String AN = event.getAuthor().getName();
-        reddit.submit(subredditS, AN + ":" + postTString /*.replace(" ","-")*/, postContent/*.replace(" ", "-")*/, postType);
-
-        System.out.println("sleep");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-        }
-        System.out.println("slept");
-        Link post = reddit.getSubreddit(subredditS).getNew(1).get(0);
-
-        if (post.getAuthor().equals(redditUser.getName())) {
-
-            event.getChannel().sendMessage("https://www.reddit.com" + post.getPermalink()).queue();
-        } else {
-            System.out.println(redditUser.getName() + ": " + post.getAuthor());
-        }
-
-
-    }
 
     public static class listenersPerigosos extends ListenerAdapter {
         public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
