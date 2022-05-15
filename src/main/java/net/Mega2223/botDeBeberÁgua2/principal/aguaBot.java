@@ -4,6 +4,7 @@ import lavaplayer.PlayerManager;
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
 import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
 import net.Mega2223.botDeBeberÁgua2.objects.PingPongMatch;
+import net.Mega2223.botDeBeberÁgua2.objects.TextFileModifier;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -22,6 +23,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.apache.hc.core5.http.ParseException;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
 import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
@@ -45,20 +49,22 @@ public class aguaBot {
     static final String LOG_PATH = projectPath + "\\log.txt";
     static final String PROPERTIES_PATH = projectPath + "\\configs.properties";
     protected static final String fileCreatorPath = projectPath + "\\src\\main\\java\\net\\Mega2223\\arquivosConfidenciais";
-    protected static final String ImperioID = "606274842722959384";
+    public static SpotifyApi spotify;
     static final String Mega2223ID = "301424656051732491";
     public static List<String> BOTBANNED;
     public static List<String> TRUSTED;
     public static JDABuilder builder;
     public static JDA jda;
+    public static Guild MainGuild;
     public static TextChannel canalDoBot;
-    public static Guild Imperio;
+    public static String[] SpotifyKey;
     public static ListenerAdapter Perigosos;
     public static PlayerManager playerManager;
     public static ListenerAdapter kik;
     public static String log;
     public static Properties properties;
     public static String JDAKey;
+    protected static String MainGuildID;
     public static List<Notifier> Notifiers;
     public static List<PingPongMatch> universalMatches;
     public static Janela currentJanela;
@@ -67,15 +73,18 @@ public class aguaBot {
     protected static String TCBotID;
     public static List<String> waterUrls;
 
-    public static void main(String[] args) throws LoginException, IOException {
+    public static void main(String[] args) throws LoginException, IOException, ParseException, SpotifyWebApiException {
         DataInputStream inputStream = new DataInputStream(new FileInputStream(new File(projectPath + "\\key.txt")));
         String key = inputStream.readLine();
         inputStream.close();
         JDAKey = key.split(" ")[0];
+        SpotifyKey = key.split(" ")[1].split(";");
 
+        spotify = new SpotifyApi.Builder().setClientId(SpotifyKey[0]).setClientSecret(SpotifyKey[1]).build();
+        refreshSpotifyKey();
 
         System.out.println("Ativando o JDA na key " + JDAKey);
-        System.out.println("Ativando o Reddit nas keys " + key.split(" ")[1]);
+        System.out.println("Ativando o Spotify nas keys " + SpotifyKey[0] + " e " + SpotifyKey[1]);
 
         builder = JDABuilder.create(JDAKey, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_PRESENCES, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_VOICE_STATES);
         EnumSet<GatewayIntent> intents = GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS);
@@ -106,8 +115,8 @@ public class aguaBot {
 
         initalizeLists();
 
-        Imperio.loadMembers();
-        Imperio.getMemberCache();
+        MainGuild.loadMembers();
+        MainGuild.getMemberCache();
 
 
         jda.addEventListener(new aguaListener());
@@ -120,22 +129,26 @@ public class aguaBot {
 
         //createConsoleListener();
 
-        System.out.println("tudopronto");
+        System.out.println(TextFileModifier.readFile(fileCreatorPath + "\\startup.txt").replace("null", ""));
+        System.out.println("Um bot muito foda feito por uma pessoa não tão foda assim;");
+
         Message mensagemfoda = canalDoBot.sendMessage("tudo pronto to rodando").complete();
 
 
         try {
+            System.out.println("Rotina de delay de 10 segundos iniciada;");
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        System.out.println("Rotina de delay de 10 segundos completa;");
         mensagemfoda.delete().queue();
 
         //List<Member> eba = Imperio.getMembers();s
         //402804167317520385
 
-        Guild cupula = jda.getGuildById("324759074056962048");
+        //Guild cupula = jda.getGuildById("324759074056962048");
 
         /*for(TextChannel act : cupula.getTextChannels()){
             List<Message> msga = act.getHistory().retrievePast(20).complete();
@@ -144,6 +157,11 @@ public class aguaBot {
             }
         }*/
 
+    }
+
+    public static void refreshSpotifyKey() throws IOException, ParseException, SpotifyWebApiException {
+        String accessToken = spotify.clientCredentials().build().execute().getAccessToken();
+        spotify.setAccessToken(accessToken);
     }
 
     private static void createConsoleListener() {/*fixme
@@ -179,7 +197,8 @@ public class aguaBot {
     }
 
     private static void initStaticObjects() {
-        Imperio = jda.getGuildById(ImperioID);
+        MainGuildID = properties.getProperty("mainguild");
+        MainGuild = jda.getGuildById(MainGuildID);
         TRUSTED = new ArrayList<>();
         BOTBANNED = new ArrayList<>();
         censoredUsers = new ArrayList<>();//eu sou mt consistente nas capslocks ne pqp
@@ -190,6 +209,7 @@ public class aguaBot {
         TCBotID = properties.getProperty("botchannel");
         playerManager = PlayerManager.getInstance();
         canalDoBot = jda.getTextChannelById(TCBotID);
+
 
     }
 
@@ -452,7 +472,7 @@ public class aguaBot {
     public static class listenersPerigosos extends ListenerAdapter {
         public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
             //System.out.println(event.getGuild().getId() + " != " +  Imperio.getId() + " / " + event.getMember().getUser().getName() + " / " + event.getGuild().getName());
-            if (!event.getGuild().getId().equals(Imperio.getId())) {
+            if (!event.getGuild().getId().equals(MainGuild.getId())) {
                 return;
             }
             String legal = "User " + event.getUser().getName() + " atualizou seu status para " + event.getNewValue().name() + "";
@@ -461,7 +481,7 @@ public class aguaBot {
         }
 
         public void onUserUpdateActivities(UserUpdateActivitiesEvent event) {
-            if (!event.getGuild().getId().equals(Imperio.getId())) {
+            if (!event.getGuild().getId().equals(MainGuild.getId())) {
                 return;
             }
             try {

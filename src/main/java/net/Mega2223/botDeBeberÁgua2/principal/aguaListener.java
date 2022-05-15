@@ -1,9 +1,11 @@
 package net.Mega2223.botDeBeberÁgua2.principal;
 
+import net.Mega2223.botDeBeberÁgua2.objects.BetterCallSaulListener;
 import net.Mega2223.botDeBeberÁgua2.objects.Janela;
 import net.Mega2223.botDeBeberÁgua2.objects.Notifier;
 import net.Mega2223.botDeBeberÁgua2.objects.TextFileModifier;
 import net.Mega2223.botDeBeberÁgua2.utils.PoorUtils;
+import net.Mega2223.botDeBeberÁgua2.utils.SpotifyUtils;
 import net.Mega2223.botDeBeberÁgua2.utils.aguaUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -15,14 +17,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.WebhookManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.utils.AttachmentOption;
+import org.apache.hc.core5.http.ParseException;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.specification.Playlist;
 
 import javax.imageio.ImageIO;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -612,6 +616,96 @@ public class aguaListener extends ListenerAdapter {
                 e.printStackTrace();
             }
 
+        } else if (rawSplit[0].equalsIgnoreCase("-migratemain")) {
+            if (rawSplit.length != 3) {
+                event.getChannel().sendMessage("Sintaxe inválida").queue();
+                return;
+            }
+            TextChannel ant = canalDoBot;
+            Guild antGuild = ant.getGuild();
+
+            Guild neoGuild = jda.getGuildById(rawSplit[1]);
+            TextChannel neoChannel = neoGuild.getTextChannelById(rawSplit[2]);
+            //todo introduzir nomes de propriedadaes como constantes
+            properties.setProperty("mainguild", rawSplit[1]);
+            properties.setProperty("botchannel", rawSplit[2]);
+            try {
+                aguaBot.saveProperties(properties);
+            } catch (IOException e) {
+            }
+
+            canalDoBot = neoChannel;
+            MainGuild = neoGuild;
+
+            event.getChannel().sendMessage("O canal de debug do bot foi trocado de \"" + ant.getName() + "\" (" + antGuild.getName() + ") para \"" +
+                    canalDoBot.getName() + "\" (" + neoGuild.getName() + ")").queue();
+
+        } else if (rawSplit[0].equalsIgnoreCase("-compresschannel")) {
+            TextChannel channel = event.getChannel();
+            channel.sendMessage("Começando compressão de conteúdo");
+            MessageHistory history = channel.getHistory();
+            List<Message> messages = history.retrievePast(100).complete();
+            for (int i = 0; i < history.size(); i = i + 100) {
+                //channel.sendMessage(i + " mensagens em cache").queue();
+                messages.addAll(history.retrievePast(100).complete());
+            }
+            String out = "";
+            for (Message act : messages) {
+                out = out + "\n";
+                out = out + act.getAuthor().getAsMention() + ":\n";
+                out = out + act.getContentRaw() + "\n";
+                for (Message.Attachment actact : act.getAttachments()) {
+                    out = out + actact.getUrl() + "\n (" + actact.getContentType() + ") \n";
+                }
+                for (MessageEmbed actact : act.getEmbeds()) {
+                    out = out + actact.getUrl() + "\n (" + actact.getType() + ") \n";
+                }
+                out = out + "\n\n";
+            }
+            try {
+                File placeHolder = File.createTempFile("backup", ".log");
+                event.getChannel().sendMessage("Aqui está:").addFile(placeHolder, new AttachmentOption[]{}).queue();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        } else if (rawSplit[0].equalsIgnoreCase("-callsaul") && isTrusted(user)) {
+            jda.addEventListener(new BetterCallSaulListener(message.getMentionedUsers().get(0)));
+        } else if (rawSplit[0].equalsIgnoreCase("-retrievespotifyuser")) {
+            try {
+                se.michaelthelin.spotify.model_objects.specification.User spotifyUser = spotify.getUsersProfile(rawSplit[1]).build().execute();
+                String retrieval = SpotifyUtils.getUserDetails(spotifyUser, SpotifyUtils.HIREARCHY_PREFIX);
+
+                File filo = File.createTempFile("filo", ".txt");
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(filo));
+                writer.write(retrieval);
+                writer.close();
+
+                event.getChannel().sendFile(filo, "content.txt").queue();
+
+            } catch (ParseException | SpotifyWebApiException | IOException e) {
+                e.printStackTrace();
+            }
+
+        } else if (rawSplit[0].equalsIgnoreCase("-retrievespotifyplaylist")) {
+            try {
+                Playlist playlist = spotify.getPlaylist(rawSplit[1]).build().execute();
+
+                String retrieval = SpotifyUtils.getPlaylistDetails(playlist, SpotifyUtils.HIREARCHY_PREFIX);
+
+                File filo = File.createTempFile("filo", ".txt");
+
+                BufferedWriter writer = new BufferedWriter(new FileWriter(filo));
+                writer.write(retrieval);
+                writer.close();
+
+                event.getChannel().sendFile(filo, "content.txt").queue();
+
+            } catch (ParseException | SpotifyWebApiException | IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
